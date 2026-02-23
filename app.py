@@ -1,4 +1,8 @@
 import os
+import time
+import hmac
+import base64
+import hashlib
 from flask import Flask, jsonify, send_from_directory
 
 app = Flask(__name__)
@@ -18,10 +22,6 @@ def get_real_balance():
 
         url = "https://api.bitget.com/api/mix/v1/account/accounts?productType=UMCBL"
 
-        import time
-import hmac
-import base64
-import hashlib
 
 timestamp = str(int(time.time() * 1000))
 method = "GET"
