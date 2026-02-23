@@ -25,11 +25,11 @@ def get_real_balance():
         secret = os.environ.get("BITGET_API_SECRET")
         passphrase = os.environ.get("BITGET_API_PASSPHRASE")
 
-        url = "https://api.bitget.com/api/mix/v1/account/accounts?productType=umcbl"
+        url = "https://api.bitget.com/api/v2/mix/account/accounts?productType=USDT-FUTURES"
 
         timestamp = str(int(time.time() * 1000))
         method = "GET"
-        request_path = "/api/mix/v1/account/accounts?productType=umcbl"
+        request_path = "/api/v2/mix/account/accounts?productType=USDT-FUTURES"
         body = ""
 
         message = timestamp + method + request_path + body
