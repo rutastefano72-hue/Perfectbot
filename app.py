@@ -1,0 +1,32 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+bot_running = False
+balance = 5000
+profit_today = 0
+profit_total = 0
+
+@app.route("/")
+def dashboard():
+    return jsonify({
+        "status": "online" if bot_running else "offline",
+        "balance": balance,
+        "profit_today": profit_today,
+        "profit_total": profit_total
+    })
+
+@app.route("/start", methods=["POST"])
+def start_bot():
+    global bot_running
+    bot_running = True
+    return jsonify({"message": "PerfectBot started"})
+
+@app.route("/stop", methods=["POST"])
+def stop_bot():
+    global bot_running
+    bot_running = False
+    return jsonify({"message": "PerfectBot stopped"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
