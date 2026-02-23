@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PerfectBot Dashboard</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    margin: 15px;
+    border-radius: 12px;
+}
+
+.value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+button {
+    padding: 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.start {
+    background: #16a34a;
+    color: white;
+}
+
+.stop {
+    background: #dc2626;
+    color: white;
+}
+</style>
+
+</head>
+<body>
+
+<h1>PerfectBot</h1>
+
+<div class="card">
+Balance
+<div id="balance" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Profit Today
+<div id="profit_today" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Profit Total
+<div id="profit_total" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Status
+<div id="status" class="value">Loading...</div>
+</div>
+
+<button class="start" onclick="startBot()">START BOT</button>
+<button class="stop" onclick="stopBot()">STOP BOT</button>
+
+<script>
+
+async function loadData() {
+
+let r = await fetch("/");
+let data = await r.json();
+
+document.getElementById("balance").innerText = "$" + data.balance;
+document.getElementById("profit_today").innerText = "$" + data.profit_today;
+document.getElementById("profit_total").innerText = "$" + data.profit_total;
+document.getElementById("status").innerText = data.status;
+
+}
+
+async function startBot() {
+
+await fetch("/start", {method:"POST"});
+loadData();
+
+}
+
+async function stopBot() {
+
+await fetch("/stop", {method:"POST"});
+loadData();
+
+}
+
+setInterval(loadData, 2000);
+loadData();
+
+</script>
+
+</body>
+</html>
