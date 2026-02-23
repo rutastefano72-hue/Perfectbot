@@ -1,6 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 
 app = Flask(__name__)
+@app.route('/dashboard.html')
+def serve_dashboard():
+    return send_from_directory('.', 'dashboard.html')
 
 bot_running = False
 balance = 5000
