@@ -65,11 +65,9 @@ def get_real_balance():
 # API stato bot
 @app.route("/status")
 def status():
-    balance = get_real_balance()
-
     return jsonify({
         "status": "online" if bot_running else "offline",
-        "balance": balance,
+        "balance": get_real_balance(),
         "profit_today": 0,
         "profit_total": 0
     })
