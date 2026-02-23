@@ -27,7 +27,7 @@ def get_real_balance():
         data = response.json()
 
         if "data" in data and len(data["data"]) > 0:
-            return float(data["data"][0]["available"])
+            return float(data["data"][0]["usdtEquity"])
         else:
             return 0
 
