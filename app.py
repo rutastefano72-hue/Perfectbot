@@ -52,6 +52,7 @@ def get_real_balance():
 
         response = requests.get(url, headers=headers)
         data = response.json()
+        print("BITGET RAW RESPONSE:", data)
 
         if "data" in data and len(data["data"]) > 0:
             return float(data["data"][0]["equity"])
