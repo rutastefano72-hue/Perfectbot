@@ -55,7 +55,7 @@ def get_real_balance():
         print("BITGET RAW RESPONSE:", data)
 
         if "data" in data and len(data["data"]) > 0:
-            return float(data["data"][0]["equity"])
+            return float(data["data"][0]["usdtEquity"])
         else:
             return 0
 
