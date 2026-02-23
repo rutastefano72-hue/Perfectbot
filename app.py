@@ -18,10 +18,33 @@ def get_real_balance():
 
         url = "https://api.bitget.com/api/mix/v1/account/accounts?productType=UMCBL"
 
-        headers = {
-            "ACCESS-KEY": api_key,
-            "ACCESS-PASSPHRASE": passphrase,
-        }
+        import time
+import hmac
+import base64
+import hashlib
+
+timestamp = str(int(time.time() * 1000))
+method = "GET"
+request_path = "/api/mix/v1/account/accounts"
+body = ""
+
+message = timestamp + method + request_path + body
+
+signature = base64.b64encode(
+    hmac.new(
+        secret.encode('utf-8'),
+        message.encode('utf-8'),
+        hashlib.sha256
+    ).digest()
+).decode()
+
+headers = {
+    "ACCESS-KEY": api_key,
+    "ACCESS-SIGN": signature,
+    "ACCESS-TIMESTAMP": timestamp,
+    "ACCESS-PASSPHRASE": passphrase,
+    "Content-Type": "application/json"
+}
 
         response = requests.get(url, headers=headers)
         data = response.json()
