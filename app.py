@@ -59,6 +59,7 @@ def get_real_balance():
             return 0
 
     except Exception as e:
+        print("BITGET ERROR:", str(e))
         return 0
 
 
