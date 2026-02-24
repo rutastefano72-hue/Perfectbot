@@ -191,13 +191,17 @@ def open_position(symbol, side, size, leverage):
 
     "symbol": symbol,
     "productType": "USDT-FUTURES",
+
     "marginMode": "crossed",
     "marginCoin": "USDT",
+
     "size": str(size),
-    "side": side,
+
+    "side": side,           # buy o sell
+    "tradeSide": "open",    # QUESTO è fondamentale
+
     "orderType": "market",
-    "force": "gtc",
-    "positionMode": "one_way"
+    "force": "gtc"
 
         }
 
