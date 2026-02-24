@@ -130,7 +130,7 @@ def market_scanner_loop():
     scanner_active = True
 
     while True:
-    try:
+        try:
         monitored_pairs = get_usdt_pairs()
         print("Scanner active. Pairs:", monitored_pairs)
 
