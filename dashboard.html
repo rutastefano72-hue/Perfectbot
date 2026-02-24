@@ -182,5 +182,46 @@ loadData();
 loadData();
 setInterval(loadData,3000);
 
-</script></body>
+<script>
+async function loadTrades() {
+    try {
+        const res = await fetch("/trades");
+        const trades = await res.json();
+
+        const table = document.getElementById("liveTrades");
+
+        if (!table) return;
+
+        table.innerHTML = "";
+
+        if (trades.length === 0) {
+            table.innerHTML = "<tr><td colspan='5'>No open trades</td></tr>";
+            return;
+        }
+
+        trades.forEach(trade => {
+            const row = `
+                <tr>
+                    <td>${trade.symbol}</td>
+                    <td>${trade.side}</td>
+                    <td>${parseFloat(trade.entry).toFixed(4)}</td>
+                    <td>${parseFloat(trade.size).toFixed(4)}</td>
+                    <td style="color:${trade.pnl >= 0 ? 'lime' : 'red'}">
+                        ${parseFloat(trade.pnl).toFixed(4)}
+                    </td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+
+    } catch(e) {
+        console.log("Trade load error", e);
+    }
+}
+
+setInterval(loadTrades, 3000);
+loadTrades();
+</script>
+  
+</body>
 </html>
