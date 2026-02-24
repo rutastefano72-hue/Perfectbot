@@ -35,7 +35,7 @@ TRAILING_STOP_PERCENT = 1.5
 app = Flask(__name__)
 
 # Persistente
-bot_running = {"state": False}
+bot_running = {"state": True}
 
 # =========================
 # DASHBOARD
