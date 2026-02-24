@@ -188,6 +188,7 @@ def market_scanner_loop():
             time.sleep(30)
 
 def start_scanner():
+    print("STARTING SCANNER THREAD...")
     thread = threading.Thread(target=market_scanner_loop)
     thread.daemon = True
     thread.start()
