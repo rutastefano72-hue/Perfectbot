@@ -34,7 +34,8 @@ TRAILING_STOP_PERCENT = 1.5
 
 app = Flask(__name__)
 
-bot_running = False
+# Persistente
+bot_running = {"state": False}
 
 # =========================
 # DASHBOARD
@@ -43,7 +44,6 @@ bot_running = False
 @app.route("/")
 def dashboard():
     return send_from_directory(".", "dashboard.html")
-
 
 # =========================
 # SIGNATURE
@@ -60,7 +60,6 @@ def generate_signature(timestamp, method, request_path, body=""):
     )
 
     return base64.b64encode(mac.digest()).decode()
-
 
 # =========================
 # BALANCE
@@ -81,13 +80,11 @@ def get_real_balance():
         )
 
         headers = {
-
             "ACCESS-KEY": API_KEY,
             "ACCESS-SIGN": signature,
             "ACCESS-TIMESTAMP": timestamp,
             "ACCESS-PASSPHRASE": PASSPHRASE,
             "Content-Type": "application/json"
-
         }
 
         url = BASE_URL + request_path
@@ -109,7 +106,6 @@ def get_real_balance():
         print("Balance error:", e)
 
         return 0
-
 
 # =========================
 # PRICE
@@ -136,7 +132,6 @@ def get_current_price(symbol):
         print("Price error:", e)
 
         return None
-
 
 # =========================
 # MARKET SYMBOLS
@@ -172,7 +167,6 @@ def get_market_symbols():
 
         return []
 
-
 # =========================
 # OPEN POSITION
 # =========================
@@ -186,7 +180,6 @@ def open_position(symbol, side, size, leverage):
         timestamp = str(int(time.time() * 1000))
 
         body = {
-
             "symbol": symbol,
             "productType": "USDT-FUTURES",
             "marginMode": "crossed",
@@ -195,7 +188,6 @@ def open_position(symbol, side, size, leverage):
             "side": side,
             "orderType": "market",
             "force": "gtc"
-
         }
 
         body_json = json.dumps(body)
@@ -208,13 +200,11 @@ def open_position(symbol, side, size, leverage):
         )
 
         headers = {
-
             "ACCESS-KEY": API_KEY,
             "ACCESS-SIGN": signature,
             "ACCESS-TIMESTAMP": timestamp,
             "ACCESS-PASSPHRASE": PASSPHRASE,
             "Content-Type": "application/json"
-
         }
 
         url = BASE_URL + request_path
@@ -222,11 +212,9 @@ def open_position(symbol, side, size, leverage):
         print("OPENING POSITION:", symbol, side, size)
 
         response = requests.post(
-
             url,
             headers=headers,
             data=body_json
-
         )
 
         print("ORDER RESPONSE:", response.json())
@@ -235,9 +223,8 @@ def open_position(symbol, side, size, leverage):
 
         print("Order error:", e)
 
-
 # =========================
-# SIGNAL (EMA + RSI)
+# SIGNAL
 # =========================
 
 def get_signal(symbol):
@@ -265,11 +252,9 @@ def get_signal(symbol):
         delta = np.diff(closes)
 
         gain = np.maximum(delta, 0)
-
         loss = -np.minimum(delta, 0)
 
         avg_gain = np.mean(gain[-14:])
-
         avg_loss = np.mean(loss[-14:])
 
         rs = avg_gain / avg_loss if avg_loss != 0 else 0
@@ -279,11 +264,9 @@ def get_signal(symbol):
         price = closes[-1]
 
         if price > ema50 and ema50 > ema200 and rsi < 70:
-
             return "buy"
 
         if price < ema50 and ema50 < ema200 and rsi > 30:
-
             return "sell"
 
         return None
@@ -291,9 +274,7 @@ def get_signal(symbol):
     except Exception as e:
 
         print("Signal error:", e)
-
         return None
-
 
 # =========================
 # SCAN MARKET
@@ -336,77 +317,75 @@ def scan_market():
 
         break
 
-
 # =========================
 # SCANNER LOOP
 # =========================
 
 def scanner_loop():
 
-    global bot_running
-
     print("SCANNER STARTED")
 
     while True:
 
-        print("BOT RUNNING STATE:", bot_running)
+        try:
 
-        if bot_running:
+            print("BOT STATE:", bot_running["state"])
 
-            print("SCANNING MARKET NOW...")
-            scan_market()
+            if bot_running["state"]:
+
+                print("SCANNING MARKET NOW...")
+                scan_market()
+
+            else:
+
+                print("BOT OFF")
+
+        except Exception as e:
+
+            print("SCANNER ERROR:", e)
 
         time.sleep(10)
 
-
 # =========================
-# START STOP API
+# API CONTROL
 # =========================
 
 @app.route("/start", methods=["POST"])
 def start_bot():
 
-    global bot_running
+    bot_running["state"] = True
 
-    bot_running = True
+    print("BOT STARTED")
 
     return jsonify({"success": True})
-
 
 @app.route("/stop", methods=["POST"])
 def stop_bot():
 
-    global bot_running
+    bot_running["state"] = False
 
-    bot_running = False
+    print("BOT STOPPED")
 
     return jsonify({"success": True})
-
 
 @app.route("/status")
 def status():
 
     return jsonify({
-
-        "status": "online" if bot_running else "offline",
+        "status": "online" if bot_running["state"] else "offline",
         "balance": get_real_balance()
-
     })
 
-
 # =========================
-# START THREADS
+# START THREAD
 # =========================
 
 thread = threading.Thread(target=scanner_loop)
-
 thread.daemon = True
-
 thread.start()
 
-
 # =========================
-# RUN FLASK
+# RUN
 # =========================
 
 if __name__ == "__main__":
