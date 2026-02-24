@@ -5,6 +5,16 @@ import base64
 import hashlib
 import requests
 
+# ===== TRADING SETTINGS =====
+
+LEVERAGE = 5
+
+STOP_LOSS_PERCENT = 2.0
+TAKE_PROFIT_PERCENT = 4.0
+TRAILING_STOP_PERCENT = 1.5
+
+CAPITAL_PERCENT_PER_TRADE = 0.10
+
 from flask import Flask, jsonify, send_from_directory
 
 app = Flask(__name__)
@@ -52,16 +62,42 @@ def get_real_balance():
 
         response = requests.get(url, headers=headers)
         data = response.json()
+
         print("BITGET RAW RESPONSE:", data)
 
-        if "data" in data and len(data["data"]) > 0:
-            return float(data["data"][0]["usdtEquity"])
+        if data.get("code") == "00000":
+            usdt_equity = float(data["data"][0]["usdtEquity"])
+            return usdt_equity
         else:
             return 0
 
     except Exception as e:
+        print("Balance error:", str(e))
+        return 0
+
+    except Exception as e:
         print("BITGET ERROR:", str(e))
         return 0
+
+def get_current_price(symbol):
+
+    try:
+
+        url = f"https://api.bitget.com/api/v2/mix/market/ticker?symbol={symbol}&productType=USDT-FUTURES"
+
+        response = requests.get(url)
+
+        data = response.json()
+
+        if data.get("code") == "00000":
+            return float(data["data"][0]["lastPr"])
+
+        return None
+
+    except Exception as e:
+
+        print("Price error:", str(e))
+        return None
 
 
 # API stato bot
@@ -200,17 +236,53 @@ def get_signal(symbol):
         return None
 
 def open_position(symbol, side):
+
     try:
-        # usa la funzione corretta che già hai
+
         balance = get_real_balance()
+
+        if balance is None or balance <= 0:
+            print("Balance error")
+            return
 
         amount_usdt = balance * 0.10
 
-        print(f"REAL ORDER READY: {side.upper()} {symbol} with {amount_usdt} USDT")
+        price = get_current_price(symbol)
 
-        # qui inseriremo tra poco l'ordine reale Bitget
+        if price is None:
+            print("Price error")
+            return
+
+        leverage = 5
+        tp_percent = 0.02
+        sl_percent = 0.01
+        trailing_percent = 0.005
+
+        if side == "buy":
+
+            tp_price = price * (1 + tp_percent)
+            sl_price = price * (1 - sl_percent)
+            trailing_price = price * (1 - trailing_percent)
+
+        else:
+
+            tp_price = price * (1 - tp_percent)
+            sl_price = price * (1 + sl_percent)
+            trailing_price = price * (1 + trailing_percent)
+
+        print("========== REAL TRADE READY ==========")
+        print("Symbol:", symbol)
+        print("Side:", side.upper())
+        print("Entry:", price)
+        print("TP:", tp_price)
+        print("SL:", sl_price)
+        print("Trailing:", trailing_price)
+        print("Amount USDT:", amount_usdt)
+        print("Leverage:", leverage)
+        print("=====================================")
 
     except Exception as e:
+
         print("REAL TRADE ERROR:", str(e))
 
 if __name__ == "__main__":
