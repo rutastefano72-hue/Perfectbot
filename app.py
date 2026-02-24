@@ -141,11 +141,17 @@ def get_market_symbols():
 
     try:
 
+        print("REQUESTING SYMBOLS FROM BITGET...")
+
         url = BASE_URL + "/api/v2/mix/market/contracts?productType=USDT-FUTURES"
 
         response = requests.get(url)
 
+        print("RESPONSE STATUS:", response.status_code)
+
         data = response.json()
+
+        print("RESPONSE DATA:", data)
 
         symbols = []
 
@@ -158,6 +164,8 @@ def get_market_symbols():
                 if symbol.endswith("USDT"):
 
                     symbols.append(symbol)
+
+        print("SYMBOLS FOUND:", len(symbols))
 
         return symbols
 
