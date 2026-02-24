@@ -303,17 +303,19 @@ def open_position(symbol, side):
 
         print("REAL TRADE ERROR:", str(e))
 
-if __name__ == "__main__":
-    print("BOOTING PERFECTBOT...")
+print("BOOTING PERFECTBOT...")
+start_scanner()
+print("SCANNER THREAD STARTED")
 
-    # avvia scanner in thread separato
-    import threading
-    scanner_thread = threading.Thread(target=market_scanner_loop)
-    scanner_thread.daemon = True
-    scanner_thread.start()
+import threading
 
-    print("SCANNER THREAD STARTED")
+flask_thread = threading.Thread(
+    target=lambda: app.run(host="0.0.0.0", port=10000)
+)
 
-    # avvia flask
-    app.run(host="0.0.0.0", port=10000)
+flask_thread.daemon = True
+flask_thread.start()
+
+while True:
+    time.sleep(60)
 
