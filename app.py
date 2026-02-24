@@ -4,6 +4,7 @@ import hmac
 import base64
 import hashlib
 import requests
+import json
 
 # ===== TRADING SETTINGS =====
 
@@ -298,7 +299,40 @@ def open_position(symbol, side):
         }
 
         print("SENDING REAL ORDER:", order)
-        print("======================================")
+print("======================================")
+
+api_key = os.environ.get("BITGET_API_KEY")
+secret = os.environ.get("BITGET_API_SECRET")
+passphrase = os.environ.get("BITGET_API_PASSPHRASE")
+
+timestamp = str(int(time.time() * 1000))
+method = "POST"
+request_path = "/api/v2/mix/order/place-order"
+url = "https://api.bitget.com" + request_path
+
+body = json.dumps(order)
+
+message = timestamp + method + request_path + body
+
+signature = base64.b64encode(
+    hmac.new(
+        secret.encode("utf-8"),
+        message.encode("utf-8"),
+        hashlib.sha256
+    ).digest()
+).decode()
+
+headers = {
+    "ACCESS-KEY": api_key,
+    "ACCESS-SIGN": signature,
+    "ACCESS-TIMESTAMP": timestamp,
+    "ACCESS-PASSPHRASE": passphrase,
+    "Content-Type": "application/json"
+}
+
+response = requests.post(url, headers=headers, data=body)
+
+print("BITGET ORDER RESPONSE:", response.json())
 
     except Exception as e:
 
