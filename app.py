@@ -180,6 +180,8 @@ def market_scanner_loop():
                 elif signal == "SHORT":
                     print(f"Opening SHORT on {symbol}")
                     open_position(symbol, "sell")
+                    open_position("BTCUSDT", "buy")
+time.sleep(999999)
 
             time.sleep(30)
 
