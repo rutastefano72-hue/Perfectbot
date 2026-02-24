@@ -305,10 +305,14 @@ def open_position(symbol, side):
 if __name__ == "__main__":
     print("BOOTING PERFECTBOT...")
 
-    # avvia scanner mercato
-    start_scanner()
+    # avvia scanner in thread separato
+    import threading
+    scanner_thread = threading.Thread(target=market_scanner_loop)
+    scanner_thread.daemon = True
+    scanner_thread.start()
+
     print("SCANNER THREAD STARTED")
 
-    # avvia server flask (necessario per Render)
+    # avvia flask
     app.run(host="0.0.0.0", port=10000)
 
