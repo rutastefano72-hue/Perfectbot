@@ -6,6 +6,9 @@ import hashlib
 import requests
 import json
 
+import threading
+import time
+
 # ===== TRADING SETTINGS =====
 
 LEVERAGE = 5
@@ -455,4 +458,57 @@ def get_trades():
         print("Trades error:", e)
 
         return jsonify([])
+
+def get_market_symbols():
+
+    try:
+
+        url = BASE_URL + "/api/v2/mix/market/contracts?productType=USDT-FUTURES"
+
+        response = requests.get(url)
+        data = response.json()
+
+        symbols = []
+
+        if "data" in data:
+
+            for item in data["data"]:
+
+                symbol = item["symbol"]
+
+                if symbol.endswith("USDT"):
+                    symbols.append(symbol)
+
+        return symbols
+
+    except Exception as e:
+
+        print("Market scan error:", e)
+        return []
+
+
+def scan_market():
+
+    symbols = get_market_symbols()
+
+    print("Found symbols:", len(symbols))
+
+    for symbol in symbols[:10]:
+
+        print("Scanning:", symbol)
+
+def start_scanner():
+
+    while True:
+
+        if bot_running:
+
+            scan_market()
+
+        time.sleep(30)
+
+
+scanner_thread = threading.Thread(target=start_scanner)
+scanner_thread.daemon = True
+scanner_thread.start()
 
