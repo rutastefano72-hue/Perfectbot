@@ -291,14 +291,12 @@ def get_signal(symbol):
 def scan_market():
 
     symbols = get_market_symbols()
-    print("SYMBOLS:", symbols[:5])
 
     print("Scanning symbols:", len(symbols))
 
     for symbol in symbols[:5]:
 
         signal = get_signal(symbol)
-        print("Signal for", symbol, ":", signal)
 
         if signal is None:
             continue
@@ -310,30 +308,30 @@ def scan_market():
 
         balance = get_real_balance()
 
-amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
+        amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
 
-raw_size = (amount_usdt * LEVERAGE) / price
+        raw_size = (amount_usdt * LEVERAGE) / price
 
-min_size = 0.01
+        min_size = 0.01
 
-if raw_size < min_size:
-    print("Size too small, skipping:", symbol)
-    continue
+        if raw_size < min_size:
+            print("Size too small, skipping:", symbol)
+            continue
 
-position_size = raw_size
+        position_size = raw_size
 
-side = signal
+        side = signal
 
-print("Opening:", symbol, side, position_size)
+        print("Opening:", symbol, side, position_size)
 
-open_position(
-    symbol,
-    side,
-    round(position_size, 3),
-    LEVERAGE
-)
+        open_position(
+            symbol,
+            side,
+            round(position_size, 3),
+            LEVERAGE
+        )
 
-break
+        break
 
 # =========================
 # SCANNER LOOP
