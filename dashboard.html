@@ -1,7 +1,7 @@
 <!DOCTYPE html><html>
 <head>
 <meta charset="UTF-8">
-<title>PerfectBot Professional</title><style>
+<title>PerfectBot Terminal</title><style>
 
 body{
 margin:0;
@@ -12,32 +12,34 @@ display:flex;
 }
 
 .sidebar{
-width:70px;
-background:#050a18;
+width:180px;
+background:#020617;
 height:100vh;
-display:flex;
-flex-direction:column;
-align-items:center;
-padding-top:20px;
-gap:15px;
+padding:15px;
 }
 
-.btn{
-width:50px;
-height:50px;
+.sidebar h2{
+font-size:18px;
+margin-bottom:20px;
+}
+
+.sidebar button{
+width:100%;
+padding:12px;
+margin-bottom:10px;
 border:none;
-border-radius:10px;
-cursor:pointer;
+border-radius:8px;
 color:white;
+cursor:pointer;
 font-weight:bold;
 }
 
 .start{background:#16a34a;}
 .stop{background:#dc2626;}
-.refresh{background:#2563eb;}
 .emergency{background:#f59e0b;}
 .ai{background:#7c3aed;}
 .telegram{background:#229ED9;}
+.refresh{background:#2563eb;}
 
 .main{
 flex:1;
@@ -46,28 +48,25 @@ padding:20px;
 
 .top{
 display:flex;
-gap:20px;
+gap:15px;
 }
 
 .card{
-background:#050a18;
-padding:20px;
+background:#020617;
+padding:15px;
 border-radius:10px;
-min-width:200px;
+flex:1;
 }
 
 .value{
-font-size:24px;
-margin-top:10px;
+font-size:22px;
+margin-top:5px;
 }
-
-.green{color:#22c55e;}
-.red{color:#ef4444;}
 
 .section{
 margin-top:20px;
-background:#050a18;
-padding:20px;
+background:#020617;
+padding:15px;
 border-radius:10px;
 }
 
@@ -76,7 +75,7 @@ width:100%;
 border-collapse:collapse;
 }
 
-td,th{
+th,td{
 padding:10px;
 border-bottom:1px solid #1f2937;
 text-align:left;
@@ -87,35 +86,35 @@ background:#0b1220;
 border:1px solid #1f2937;
 color:white;
 padding:5px;
-width:80px;
 border-radius:5px;
+width:70px;
 }
 
-canvas{
-background:#050a18;
-border-radius:10px;
-}
+</style></head><body><div class="sidebar"><h2>PerfectBot</h2><button class="start" onclick="startBot()">START BOT</button>
 
-</style></head><body><div class="sidebar"><button class="btn start" onclick="startBot()">▶</button>
-<button class="btn stop" onclick="stopBot()">■</button>
-<button class="btn refresh" onclick="loadData()">⟳</button>
-<button class="btn emergency">!</button>
-<button class="btn ai">AI</button>
-<button class="btn telegram">TG</button>
+<button class="stop" onclick="stopBot()">STOP BOT</button>
 
-</div><div class="main"><h2>PerfectBot Professional</h2><div class="top"><div class="card">
+<button class="emergency">EMERGENCY CLOSE</button>
+
+<button class="ai">AI ON / OFF</button>
+
+<button class="telegram">CONNECT TELEGRAM</button>
+
+<button class="refresh" onclick="loadData()">REFRESH DATA</button>
+
+</div><div class="main"><div class="top"><div class="card">
 Balance
 <div id="balance" class="value">$0</div>
 </div><div class="card">
 Profit Today
-<div id="profitToday" class="value green">$0</div>
+<div id="profitToday" class="value">$0</div>
 </div><div class="card">
 Profit Total
-<div id="profitTotal" class="value green">$0</div>
+<div id="profitTotal" class="value">$0</div>
 </div><div class="card">
 Status
 <div id="status" class="value">offline</div>
-</div></div><div class="section"><h3>Controls</h3>Leverage
+</div></div><div class="section"><h3>Trading Controls</h3>Leverage
 <input id="leverage" value="5">
 
 TP %
@@ -127,37 +126,29 @@ SL %
 Capital %
 <input id="capital" value="10">
 
-</div><div class="section"><h3>Live Trades</h3><table>
-<thead>
+</div><div class="section"><h3>Live Trades</h3><table><thead>
 <tr>
 <th>Symbol</th>
 <th>Side</th>
 <th>Entry</th>
-<th>Profit</th>
+<th>PNL</th>
 </tr>
-</thead><tbody id="trades">
-<tr>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-</tr>
-</tbody></table></div><div class="section"><h3>Trade History</h3><table>
-<thead>
+</thead><tbody id="trades"><tr>
+<td>No trades</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr></tbody></table></div><div class="section"><h3>Trade History</h3><table><thead>
 <tr>
 <th>Symbol</th>
 <th>Result</th>
 <th>Profit</th>
 </tr>
-</thead><tbody id="history">
-<tr>
-<td>—</td>
-<td>—</td>
-<td>—</td>
-</tr>
-</tbody></table></div><div class="section"><h3>Performance</h3><canvas id="chart" height="100"></canvas>
-
-</div></div><script>
+</thead><tbody id="history"><tr>
+<td>No history</td>
+<td>-</td>
+<td>-</td>
+</tr></tbody></table></div></div><script>
 
 async function loadData(){
 
@@ -165,8 +156,11 @@ let res=await fetch("/status");
 let data=await res.json();
 
 document.getElementById("balance").innerText="$"+data.balance;
+
 document.getElementById("profitToday").innerText="$"+data.profit_today;
+
 document.getElementById("profitTotal").innerText="$"+data.profit_total;
+
 document.getElementById("status").innerText=data.status;
 
 }
@@ -186,7 +180,7 @@ loadData();
 }
 
 loadData();
-setInterval(loadData,5000);
+setInterval(loadData,3000);
 
 </script></body>
 </html>
