@@ -279,21 +279,21 @@ def open_position(symbol, side):
         print("Trailing:", trailing_price)
         print("Amount USDT:", amount_usdt)
         print("Leverage:", leverage)
-        # invio ordine reale a Bitget
 
-order = {
-    "symbol": symbol,
-    "productType": "USDT-FUTURES",
-    "marginMode": "crossed",
-    "marginCoin": "USDT",
-    "size": str(round(amount_usdt / price, 4)),
-    "side": "buy" if side == "buy" else "sell",
-    "orderType": "market",
-    "force": "gtc"
-}
+        # creazione ordine reale
+        order = {
+            "symbol": symbol,
+            "productType": "USDT-FUTURES",
+            "marginMode": "crossed",
+            "marginCoin": "USDT",
+            "size": str(round(amount_usdt / price, 3)),
+            "side": "buy" if side == "buy" else "sell",
+            "orderType": "market",
+            "force": "gtc"
+        }
 
-print("SENDING REAL ORDER:", order)
-        print("=====================================")
+        print("SENDING REAL ORDER:", order)
+        print("======================================")
 
     except Exception as e:
 
