@@ -161,6 +161,7 @@ def get_usdt_pairs():
         return []
 
 def market_scanner_loop():
+    print("SCANNER LOOP STARTED")
     global monitored_pairs, scanner_active
 
     scanner_active = True
