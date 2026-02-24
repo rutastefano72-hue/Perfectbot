@@ -189,8 +189,10 @@ def market_scanner_loop():
 
 def start_scanner():
     print("STARTING SCANNER THREAD...")
-    thread = threading.Thread(target=market_scanner_loop, daemon=True)
+    thread = threading.Thread(target=market_scanner_loop)
+    thread.daemon = True
     thread.start()
+    print("SCANNER THREAD STARTED SUCCESSFULLY")
     return thread
 
 import pandas as pd
