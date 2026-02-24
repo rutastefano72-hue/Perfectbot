@@ -301,104 +301,59 @@ def get_signal(symbol):
         print("Signal error:", e)
         return None
 
-def open_position(symbol, side):
+def open_position(symbol, side, size, leverage):
 
     try:
 
-        balance = get_real_balance()
+        url = BASE_URL + "/api/v2/mix/order/place-order"
 
-        if balance is None or balance <= 0:
-            print("Balance error")
-            return
+        timestamp = str(int(time.time() * 1000))
 
-        amount_usdt = balance * 0.10
-
-        price = get_current_price(symbol)
-
-        if price is None:
-            print("Price error")
-            return
-
-        leverage = 5
-        tp_percent = 0.02
-        sl_percent = 0.01
-        trailing_percent = 0.005
-
-        if side == "buy":
-            tp_price = price * (1 + tp_percent)
-            sl_price = price * (1 - sl_percent)
-            trailing_price = price * (1 - trailing_percent)
-        else:
-            tp_price = price * (1 - tp_percent)
-            sl_price = price * (1 + sl_percent)
-            trailing_price = price * (1 + trailing_percent)
-
-        print("========== REAL TRADE READY ==========")
-        print("Symbol:", symbol)
-        print("Side:", side.upper())
-        print("Entry:", price)
-        print("TP:", tp_price)
-        print("SL:", sl_price)
-        print("Trailing:", trailing_price)
-        print("Amount USDT:", amount_usdt)
-        print("Leverage:", leverage)
-
-        order = {
+        body = {
             "symbol": symbol,
             "productType": "USDT-FUTURES",
             "marginMode": "crossed",
             "marginCoin": "USDT",
-            "size": str(round(amount_usdt / price, 3)),
-            "side": "buy" if side == "buy" else "sell",
+            "size": str(size),
+            "side": side,
             "orderType": "market",
             "force": "gtc"
         }
 
-        print("SENDING REAL ORDER:", order)
-        print("======================================")
+        body_json = json.dumps(body)
 
-        api_key = os.environ.get("BITGET_API_KEY")
-        secret = os.environ.get("BITGET_API_SECRET")
-        passphrase = os.environ.get("BITGET_API_PASSPHRASE")
-
-        timestamp = str(int(time.time() * 1000))
-        method = "POST"
-        request_path = "/api/v2/mix/order/place-order"
-        url = "https://api.bitget.com" + request_path
-
-        body = json.dumps(order)
-
-        message = timestamp + method + request_path + body
-
-        signature = base64.b64encode(
-            hmac.new(
-                secret.encode("utf-8"),
-                message.encode("utf-8"),
-                hashlib.sha256
-            ).digest()
-        ).decode()
+        sign = generate_signature(
+            timestamp,
+            "POST",
+            "/api/v2/mix/order/place-order",
+            body_json
+        )
 
         headers = {
-            "ACCESS-KEY": api_key,
-            "ACCESS-SIGN": signature,
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": sign,
             "ACCESS-TIMESTAMP": timestamp,
-            "ACCESS-PASSPHRASE": passphrase,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
             "Content-Type": "application/json"
         }
 
-        response = requests.post(url, headers=headers, data=body)
+        print("SENDING REAL ORDER:", body)
+
+        response = requests.post(
+            url,
+            headers=headers,
+            data=body_json
+        )
 
         print("BITGET ORDER RESPONSE:", response.json())
 
     except Exception as e:
-
-        print("REAL TRADE ERROR:", str(e))
+        print("Order error:", e)
 
 print("BOOTING PERFECTBOT...")
 start_scanner()
 print("SCANNER THREAD STARTED")
 
-import threading
 
 flask_thread = threading.Thread(
     target=lambda: app.run(host="0.0.0.0", port=10000)
@@ -490,6 +445,45 @@ def get_market_symbols():
 def scan_market():
 
     symbols = get_market_symbols()
+    price = get_price(symbol)
+
+if price is None:
+    continue
+
+side = "buy"  # per ora test LONG
+
+balance = get_real_balance()
+
+capital_percent = 10
+leverage = 5
+tp_percent = 4
+sl_percent = 2
+trailing_percent = 1
+
+amount_usdt = balance * (capital_percent / 100)
+
+position_size = (amount_usdt * leverage) / price
+
+tp_price = price * (1 + tp_percent / 100)
+sl_price = price * (1 - sl_percent / 100)
+trailing_price = price * (1 - trailing_percent / 100)
+
+print("Side:", side.upper())
+print("Entry:", price)
+print("TP:", tp_price)
+print("SL:", sl_price)
+print("Trailing:", trailing_price)
+print("Amount USDT:", amount_usdt)
+print("Leverage:", leverage)
+
+open_position(
+    symbol=symbol,
+    side=side,
+    size=round(position_size, 3),
+    leverage=leverage
+)
+
+break
 
     print("Found symbols:", len(symbols))
 
