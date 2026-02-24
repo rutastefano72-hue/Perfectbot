@@ -209,7 +209,30 @@ def open_position(symbol, side):
         balance = get_balance()
         amount_usdt = balance * 0.10
 
-        print(f"Executing {side.upper()} on {symbol} with {amount_usdt} USDT")
+        if amount_usdt < 1:
+            print("Balance too low, skipping trade")
+            return
+
+        leverage = 5
+
+        order = {
+            "symbol": symbol,
+            "marginCoin": "USDT",
+            "size": str(round(amount_usdt, 2)),
+            "side": "buy" if side == "buy" else "sell",
+            "orderType": "market",
+            "force": "gtc"
+        }
+
+        print(f"SENDING REAL ORDER: {side.upper()} {symbol} {amount_usdt} USDT")
+
+        response = bitget_request(
+            "POST",
+            "/api/v2/mix/order/place-order",
+            order
+        )
+
+        print("ORDER RESPONSE:", response)
 
     except Exception as e:
-        print("Execution error:", e)
+        print("REAL TRADE ERROR:", str(e))
