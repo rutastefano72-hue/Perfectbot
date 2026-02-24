@@ -130,10 +130,23 @@ def market_scanner_loop():
     scanner_active = True
 
     while True:
-        try:
-            monitored_pairs = get_usdt_pairs()
-            print("Scanner active. Pairs:", monitored_pairs)
-            time.sleep(30)
+    try:
+        monitored_pairs = get_usdt_pairs()
+        print("Scanner active. Pairs:", monitored_pairs)
+
+        for symbol in monitored_pairs:
+
+            signal = get_signal(symbol)
+
+            if signal == "LONG":
+                print(f"Opening LONG on {symbol}")
+                open_position(symbol, "buy")
+
+            elif signal == "SHORT":
+                print(f"Opening SHORT on {symbol}")
+                open_position(symbol, "sell")
+
+         time.sleep(30)
 
         except Exception as e:
             print("Scanner loop error:", str(e))
@@ -191,3 +204,13 @@ def get_signal(symbol):
 start_scanner()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
+def open_position(symbol, side):
+    try:
+        balance = get_balance()
+        amount_usdt = balance * 0.10
+
+        print(f"Executing {side.upper()} on {symbol} with {amount_usdt} USDT")
+
+    except Exception as e:
+        print("Execution error:", e)
