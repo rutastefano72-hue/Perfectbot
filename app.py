@@ -325,14 +325,21 @@ def scan_market():
 
         position_size = (amount_usdt * LEVERAGE) / price
 
-        open_position(
+        if signal == "LONG":
+    side = "buy"
+elif signal == "SHORT":
+    side = "sell"
+else:
+    continue
 
-            symbol,
-            signal,
-            round(position_size, 3),
-            LEVERAGE
+print("Opening:", symbol, side, position_size)
 
-        )
+open_position(
+    symbol,
+    side,
+    round(position_size, 3),
+    LEVERAGE
+)
 
         break
 
