@@ -199,11 +199,6 @@ def get_signal(symbol):
         print("Signal error:", e)
         return None
 
-# avvia scanner automaticamente
-start_scanner()
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
-
 def open_position(symbol, side):
     try:
         # usa la funzione corretta che già hai
@@ -217,3 +212,8 @@ def open_position(symbol, side):
 
     except Exception as e:
         print("REAL TRADE ERROR:", str(e))
+
+if __name__ == "__main__":
+    start_scanner()
+    app.run(host="0.0.0.0", port=10000)
+
