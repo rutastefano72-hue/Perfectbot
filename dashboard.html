@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html>
-
+<!DOCTYPE html><html>
 <head>
 <meta charset="UTF-8">
-<title>PerfectBot Terminal</title>
-
-<style>
+<title>PerfectBot Terminal</title><style>
 
 body{
 margin:0;
@@ -35,6 +31,162 @@ border:none;
 border-radius:8px;
 color:white;
 cursor:pointer;
+font-weight:bold;
+}
+
+.start{background:#16a34a;}
+.stop{background:#dc2626;}
+.emergency{background:#f59e0b;}
+.ai{background:#7c3aed;}
+.telegram{background:#229ED9;}
+.refresh{background:#2563eb;}
+
+.main{
+flex:1;
+padding:20px;
+}
+
+.top{
+display:flex;
+gap:15px;
+}
+
+.card{
+background:#020617;
+padding:15px;
+border-radius:10px;
+flex:1;
+}
+
+.value{
+font-size:22px;
+margin-top:5px;
+}
+
+.section{
+margin-top:20px;
+background:#020617;
+padding:15px;
+border-radius:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #1f2937;
+text-align:left;
+}
+
+input{
+background:#0b1220;
+border:1px solid #1f2937;
+color:white;
+padding:5px;
+border-radius:5px;
+width:70px;
+}
+
+</style></head><body><div class="sidebar"><h2>PerfectBot</h2><button class="start" onclick="startBot()">START BOT</button>
+
+<button class="stop" onclick="stopBot()">STOP BOT</button>
+
+<button class="emergency">EMERGENCY CLOSE</button>
+
+<button class="ai">AI ON / OFF</button>
+
+<button class="telegram">CONNECT TELEGRAM</button>
+
+<button class="refresh" onclick="loadData()">REFRESH DATA</button>
+
+</div><div class="main"><div class="top"><div class="card">
+Balance
+<div id="balance" class="value">$0</div>
+</div><div class="card">
+Profit Today
+<div id="profitToday" class="value">$0</div>
+</div><div class="card">
+Profit Total
+<div id="profitTotal" class="value">$0</div>
+</div><div class="card">
+Status
+<div id="status" class="value">offline</div>
+</div></div><div class="section"><h3>Trading Controls</h3>Leverage
+<input id="leverage" value="5">
+
+TP %
+<input id="tp" value="4">
+
+SL %
+<input id="sl" value="2">
+
+Capital %
+<input id="capital" value="10">
+
+</div><div class="section"><h3>Live Trades</h3><table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Side</th>
+<th>Entry</th>
+<th>PNL</th>
+</tr>
+</thead><tbody id="trades">
+<tr>
+<td>No trades</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table></div><div class="section"><h3>Trade History</h3><table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Result</th>
+<th>Profit</th>
+</tr>
+</thead><tbody id="history">
+<tr>
+<td>No history</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody></table></div></div><script>
+
+async function loadData(){
+
+let res=await fetch("/status");
+let data=await res.json();
+
+document.getElementById("balance").innerText="$"+data.balance;
+document.getElementById("profitToday").innerText="$"+data.profit_today;
+document.getElementById("profitTotal").innerText="$"+data.profit_total;
+document.getElementById("status").innerText=data.status;
+
+}
+
+async function startBot(){
+
+await fetch("/start",{method:"POST"});
+loadData();
+
+}
+
+async function stopBot(){
+
+await fetch("/stop",{method:"POST"});
+loadData();
+
+}
+
+setInterval(loadData,3000);
+loadData();
+
+</script></body>
+</html>cursor:pointer;
 font-weight:bold;
 }
 
