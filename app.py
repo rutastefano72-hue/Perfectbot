@@ -146,7 +146,7 @@ def market_scanner_loop():
                 print(f"Opening SHORT on {symbol}")
                 open_position(symbol, "sell")
 
-         time.sleep(30)
+            time.sleep(30)
 
         except Exception as e:
             print("Scanner loop error:", str(e))
