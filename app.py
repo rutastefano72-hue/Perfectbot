@@ -313,7 +313,15 @@ def scan_market():
         amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
 
         raw_size = (amount_usdt * LEVERAGE) / price
-position_size = max(raw_size, 0.001)
+
+# minimum safe size for Bitget Futures
+min_size = 0.01
+
+if raw_size < min_size:
+    print("Size too small, skipping:", symbol)
+    continue
+
+position_size = raw_size
 
         side = signal
 
