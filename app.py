@@ -283,12 +283,14 @@ def get_signal(symbol):
 def scan_market():
 
     symbols = get_market_symbols()
+    print("SYMBOLS:", symbols[:5])
 
     print("Scanning symbols:", len(symbols))
 
     for symbol in symbols[:5]:
 
         signal = get_signal(symbol)
+        print("Signal for", symbol, ":", signal)
 
         if signal is None:
             continue
