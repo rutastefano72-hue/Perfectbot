@@ -206,20 +206,14 @@ if __name__ == "__main__":
 
 def open_position(symbol, side):
     try:
-        balance = get_usdt_balance()
+        # usa la funzione corretta che già hai
+        balance = get_real_balance()
+
         amount_usdt = balance * 0.10
 
-        print(f"SENDING REAL ORDER: {side.upper()} {symbol} {amount_usdt} USDT")
+        print(f"REAL ORDER READY: {side.upper()} {symbol} with {amount_usdt} USDT")
 
-        order = bitget_place_order(
-            symbol=symbol,
-            side=side,
-            marginCoin="USDT",
-            size=amount_usdt,
-            orderType="market"
-        )
-
-        print("ORDER RESPONSE:", order)
+        # qui inseriremo tra poco l'ordine reale Bitget
 
     except Exception as e:
-        print("Execution error:", str(e))
+        print("REAL TRADE ERROR:", str(e))
