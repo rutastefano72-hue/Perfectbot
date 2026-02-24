@@ -302,7 +302,9 @@ def open_position(symbol, side):
 
 if __name__ == "__main__":
     print("BOOTING PERFECTBOT...")
-    scanner_thread = start_scanner()
-    print("SCANNER THREAD STARTED:", scanner_thread.is_alive())
-    app.run(host="0.0.0.0", port=10000)
+    start_scanner()
+    print("SCANNER THREAD STARTED")
+
+    while True:
+        time.sleep(999999)
 
