@@ -350,3 +350,52 @@ flask_thread.start()
 while True:
     time.sleep(60)
 
+@app.route("/trades")
+def get_trades():
+
+    try:
+
+        url = "https://api.bitget.com/api/v2/mix/position/all-position"
+
+        timestamp = str(int(time.time() * 1000))
+
+        params = "productType=USDT-FUTURES"
+
+        sign = generate_signature(timestamp, "GET", "/api/v2/mix/position/all-position", params)
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": sign,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(url + "?" + params, headers=headers)
+
+        data = response.json()
+
+        trades = []
+
+        if "data" in data and data["data"]:
+
+            for pos in data["data"]:
+
+                if float(pos["total"]) > 0:
+
+                    trades.append({
+                        "symbol": pos["symbol"],
+                        "side": pos["holdSide"],
+                        "entry": pos["openPriceAvg"],
+                        "size": pos["total"],
+                        "pnl": pos["unrealizedPL"]
+                    })
+
+        return jsonify(trades)
+
+    except Exception as e:
+
+        print("Trades error:", e)
+
+        return jsonify([])
+
