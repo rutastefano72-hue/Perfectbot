@@ -195,6 +195,8 @@ def start_scanner():
     thread.start()
     print("SCANNER THREAD STARTED SUCCESSFULLY")
     return thread
+    
+    start_scanner()
 
 import pandas as pd
 import numpy as np
