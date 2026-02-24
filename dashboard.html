@@ -1,78 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PerfectBot</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            background-color: #0b132b;
-            color: white;
-            font-family: Arial;
-            text-align: center;
-            padding: 20px;
-        }
+<title>PerfectBot Dashboard</title>
 
-        .card {
-            background-color: #1c2541;
-            padding: 20px;
-            margin: 15px;
-            border-radius: 10px;
-            font-size: 24px;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin: 10px;
-            border: none;
-            border-radius: 8px;
-            color: white;
-        }
+<style>
 
-        .start {
-            background-color: green;
-        }
+body {
+    background: #0f172a;
+    color: white;
+    font-family: Arial;
+    margin: 0;
+}
 
-        .stop {
-            background-color: red;
-        }
-    </style>
+.header {
+    background: #020617;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.container {
+    padding: 20px;
+}
+
+.card {
+    background: #020617;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.value {
+    font-size: 28px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.start {
+    background: #16a34a;
+    color: white;
+}
+
+.stop {
+    background: #dc2626;
+    color: white;
+}
+
+.log {
+    height: 200px;
+    overflow: auto;
+    background: black;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+</style>
 </head>
+
 <body>
 
-<h1>PerfectBot</h1>
+<div class="header">
+PerfectBot Dashboard
+</div>
 
-<div class="card">Balance: <span id="balance">Loading...</span></div>
-<div class="card">Profit Today: <span id="profit_today">Loading...</span></div>
-<div class="card">Profit Total: <span id="profit_total">Loading...</span></div>
-<div class="card">Status: <span id="status">Loading...</span></div>
+<div class="container">
+
+<div class="card">
+Bot Status:
+<div class="value" id="status">Loading...</div>
+</div>
+
+<div class="card">
+Balance:
+<div class="value" id="balance">$0</div>
+</div>
+
+<div class="card">
+Profit Today:
+<div class="value" id="profit">$0</div>
+</div>
+
+<div class="card">
 
 <button class="start" onclick="startBot()">START BOT</button>
+
 <button class="stop" onclick="stopBot()">STOP BOT</button>
+
+</div>
+
+<div class="card">
+Logs:
+<div class="log" id="log"></div>
+</div>
+
+</div>
 
 <script>
 
-async function loadStatus() {
-    const res = await fetch("/status");
-    const data = await res.json();
+async function updateStatus() {
 
-    document.getElementById("balance").innerText = data.balance;
-    document.getElementById("profit_today").innerText = data.profit_today;
-    document.getElementById("profit_total").innerText = data.profit_total;
+    const response = await fetch("/status");
+    const data = await response.json();
+
     document.getElementById("status").innerText = data.status;
+
+    document.getElementById("balance").innerText =
+        "$" + data.balance.toFixed(2);
+
 }
 
 async function startBot() {
-    await fetch("/start", {method:"POST"});
-    loadStatus();
+
+    await fetch("/start", { method: "POST" });
+
+    log("Bot started");
+
 }
 
 async function stopBot() {
-    await fetch("/stop", {method:"POST"});
-    loadStatus();
+
+    await fetch("/stop", { method: "POST" });
+
+    log("Bot stopped");
+
 }
 
-loadStatus();
+function log(text) {
+
+    const logDiv = document.getElementById("log");
+
+    logDiv.innerHTML =
+        new Date().toLocaleTimeString() +
+        " - " + text + "<br>" +
+        logDiv.innerHTML;
+
+}
+
+setInterval(updateStatus, 2000);
+
+updateStatus();
 
 </script>
 
