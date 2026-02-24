@@ -310,11 +310,10 @@ def scan_market():
 
         balance = get_real_balance()
 
-        amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
+amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
 
-        raw_size = (amount_usdt * LEVERAGE) / price
+raw_size = (amount_usdt * LEVERAGE) / price
 
-# minimum safe size for Bitget Futures
 min_size = 0.01
 
 if raw_size < min_size:
@@ -323,18 +322,18 @@ if raw_size < min_size:
 
 position_size = raw_size
 
-        side = signal
+side = signal
 
-        print("Opening:", symbol, side, position_size)
+print("Opening:", symbol, side, position_size)
 
-        open_position(
-            symbol,
-            side,
-            round(position_size, 3),
-            LEVERAGE
-        )
+open_position(
+    symbol,
+    side,
+    round(position_size, 3),
+    LEVERAGE
+)
 
-        break
+break
 
 # =========================
 # SCANNER LOOP
