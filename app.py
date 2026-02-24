@@ -94,3 +94,55 @@ def stop_bot():
 # Avvio server
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+    # === MARKET SCANNER STANDARD MODE ===
+
+import threading
+import time
+import requests
+
+scanner_active = False
+monitored_pairs = []
+
+def get_usdt_pairs():
+    try:
+        url = "https://api.bitget.com/api/v2/mix/market/tickers?productType=USDT-FUTURES"
+        response = requests.get(url)
+        data = response.json()
+
+        pairs = []
+        for item in data.get("data", []):
+            symbol = item.get("symbol", "")
+            volume = float(item.get("quoteVolume", 0))
+
+            if symbol.endswith("USDT") and volume > 1000000:
+                pairs.append(symbol)
+
+        pairs.sort()
+        return pairs[:25]
+
+    except Exception as e:
+        print("SCANNER ERROR:", str(e))
+        return []
+
+def market_scanner_loop():
+    global monitored_pairs, scanner_active
+
+    scanner_active = True
+
+    while True:
+        try:
+            monitored_pairs = get_usdt_pairs()
+            print("Scanner active. Pairs:", monitored_pairs)
+            time.sleep(30)
+
+        except Exception as e:
+            print("Scanner loop error:", str(e))
+            time.sleep(30)
+
+def start_scanner():
+    thread = threading.Thread(target=market_scanner_loop)
+    thread.daemon = True
+    thread.start()
+
+# avvia scanner automaticamente
+start_scanner()
