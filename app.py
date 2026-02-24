@@ -131,10 +131,10 @@ def market_scanner_loop():
 
     while True:
         try:
-        monitored_pairs = get_usdt_pairs()
-        print("Scanner active. Pairs:", monitored_pairs)
+            monitored_pairs = get_usdt_pairs()
+            print("Scanner active. Pairs:", monitored_pairs)
 
-        for symbol in monitored_pairs:
+            for symbol in monitored_pairs:
 
             signal = get_signal(symbol)
 
