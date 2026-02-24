@@ -301,5 +301,6 @@ def open_position(symbol, side):
 
 if __name__ == "__main__":
     start_scanner()
+    print("SCANNER THREAD STARTED")
     app.run(host="0.0.0.0", port=10000)
 
