@@ -265,13 +265,10 @@ def open_position(symbol, side):
         trailing_percent = 0.005
 
         if side == "buy":
-
             tp_price = price * (1 + tp_percent)
             sl_price = price * (1 - sl_percent)
             trailing_price = price * (1 - trailing_percent)
-
         else:
-
             tp_price = price * (1 - tp_percent)
             sl_price = price * (1 + sl_percent)
             trailing_price = price * (1 + trailing_percent)
@@ -286,7 +283,6 @@ def open_position(symbol, side):
         print("Amount USDT:", amount_usdt)
         print("Leverage:", leverage)
 
-        # creazione ordine reale
         order = {
             "symbol": symbol,
             "productType": "USDT-FUTURES",
@@ -299,40 +295,40 @@ def open_position(symbol, side):
         }
 
         print("SENDING REAL ORDER:", order)
-print("======================================")
+        print("======================================")
 
-api_key = os.environ.get("BITGET_API_KEY")
-secret = os.environ.get("BITGET_API_SECRET")
-passphrase = os.environ.get("BITGET_API_PASSPHRASE")
+        api_key = os.environ.get("BITGET_API_KEY")
+        secret = os.environ.get("BITGET_API_SECRET")
+        passphrase = os.environ.get("BITGET_API_PASSPHRASE")
 
-timestamp = str(int(time.time() * 1000))
-method = "POST"
-request_path = "/api/v2/mix/order/place-order"
-url = "https://api.bitget.com" + request_path
+        timestamp = str(int(time.time() * 1000))
+        method = "POST"
+        request_path = "/api/v2/mix/order/place-order"
+        url = "https://api.bitget.com" + request_path
 
-body = json.dumps(order)
+        body = json.dumps(order)
 
-message = timestamp + method + request_path + body
+        message = timestamp + method + request_path + body
 
-signature = base64.b64encode(
-    hmac.new(
-        secret.encode("utf-8"),
-        message.encode("utf-8"),
-        hashlib.sha256
-    ).digest()
-).decode()
+        signature = base64.b64encode(
+            hmac.new(
+                secret.encode("utf-8"),
+                message.encode("utf-8"),
+                hashlib.sha256
+            ).digest()
+        ).decode()
 
-headers = {
-    "ACCESS-KEY": api_key,
-    "ACCESS-SIGN": signature,
-    "ACCESS-TIMESTAMP": timestamp,
-    "ACCESS-PASSPHRASE": passphrase,
-    "Content-Type": "application/json"
-}
+        headers = {
+            "ACCESS-KEY": api_key,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": passphrase,
+            "Content-Type": "application/json"
+        }
 
-response = requests.post(url, headers=headers, data=body)
+        response = requests.post(url, headers=headers, data=body)
 
-print("BITGET ORDER RESPONSE:", response.json())
+        print("BITGET ORDER RESPONSE:", response.json())
 
     except Exception as e:
 
