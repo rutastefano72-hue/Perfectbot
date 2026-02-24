@@ -166,11 +166,11 @@ def market_scanner_loop():
     while True:
         try:
             print("Fetching pairs...")
-monitored_pairs = get_usdt_pairs()
-
-print("Pairs found:", monitored_pairs)
+            monitored_pairs = get_usdt_pairs()
+            print("Pairs found:", monitored_pairs)
 
             for symbol in monitored_pairs:
+
                 signal = get_signal(symbol)
 
                 if signal == "LONG":
