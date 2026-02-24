@@ -304,7 +304,5 @@ if __name__ == "__main__":
     print("BOOTING PERFECTBOT...")
     start_scanner()
     print("SCANNER THREAD STARTED")
-
-    while True:
-        time.sleep(999999)
+    app.run(host="0.0.0.0", port=10000)
 
