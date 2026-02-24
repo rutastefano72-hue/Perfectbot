@@ -127,9 +127,6 @@ def stop_bot():
     return jsonify({"success": True})
 
 
-# Avvio server
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
     # === MARKET SCANNER STANDARD MODE ===
 
 import threading
