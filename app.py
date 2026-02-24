@@ -188,14 +188,17 @@ def open_position(symbol, side, size, leverage):
         timestamp = str(int(time.time() * 1000))
 
         body = {
-            "symbol": symbol,
-            "productType": "USDT-FUTURES",
-            "marginMode": "crossed",
-            "marginCoin": "USDT",
-            "size": str(size),
-            "side": side,
-            "orderType": "market",
-            "force": "gtc"
+
+    "symbol": symbol,
+    "productType": "USDT-FUTURES",
+    "marginMode": "crossed",
+    "marginCoin": "USDT",
+    "size": str(size),
+    "side": side,
+    "orderType": "market",
+    "force": "gtc",
+    "positionMode": "one_way"
+
         }
 
         body_json = json.dumps(body)
