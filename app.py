@@ -144,5 +144,48 @@ def start_scanner():
     thread.daemon = True
     thread.start()
 
+import pandas as pd
+import numpy as np
+import requests
+
+def get_signal(symbol):
+    try:
+        url = f"https://api.bitget.com/api/v2/mix/market/candles?symbol={symbol}&granularity=5m&limit=200&productType=USDT-FUTURES"
+        response = requests.get(url)
+        data = response.json()
+
+        if "data" not in data:
+            return None
+
+        candles = data["data"]
+        closes = np.array([float(c[4]) for c in candles])
+
+        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
+        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
+
+        delta = np.diff(closes)
+        gain = np.maximum(delta, 0)
+        loss = -np.minimum(delta, 0)
+
+        avg_gain = np.mean(gain[-14:])
+        avg_loss = np.mean(loss[-14:])
+
+        rs = avg_gain / avg_loss if avg_loss != 0 else 0
+        rsi = 100 - (100 / (1 + rs))
+
+        price = closes[-1]
+
+        if price > ema50 and ema50 > ema200 and rsi < 70:
+            return "LONG"
+
+        if price < ema50 and ema50 < ema200 and rsi > 30:
+            return "SHORT"
+
+        return None
+
+    except Exception as e:
+        print("Signal error:", e)
+        return None
+
 # avvia scanner automaticamente
 start_scanner()
