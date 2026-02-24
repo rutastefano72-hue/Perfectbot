@@ -349,11 +349,14 @@ def scanner_loop():
 
     while True:
 
+        print("BOT RUNNING STATE:", bot_running)
+
         if bot_running:
 
+            print("SCANNING MARKET NOW...")
             scan_market()
 
-        time.sleep(30)
+        time.sleep(10)
 
 
 # =========================
