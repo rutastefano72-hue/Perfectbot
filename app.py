@@ -197,8 +197,9 @@ def open_position(symbol, side, size, leverage):
 
     "size": str(size),
 
-    "side": side,           # buy o sell
-    "tradeSide": "open",    # QUESTO è fondamentale
+    # QUESTI SONO I VALORI CORRETTI PER ONE-WAY MODE
+    "side": "buy" if side == "buy" else "sell",
+    "tradeSide": "open",
 
     "orderType": "market",
     "force": "gtc"
