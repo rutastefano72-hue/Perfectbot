@@ -312,7 +312,8 @@ def scan_market():
 
         amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
 
-        position_size = (amount_usdt * LEVERAGE) / price
+        raw_size = (amount_usdt * LEVERAGE) / price
+position_size = max(raw_size, 0.001)
 
         side = signal
 
