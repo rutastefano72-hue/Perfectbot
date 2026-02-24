@@ -189,3 +189,5 @@ def get_signal(symbol):
 
 # avvia scanner automaticamente
 start_scanner()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
