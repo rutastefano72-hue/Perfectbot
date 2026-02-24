@@ -111,6 +111,63 @@ def status():
         "profit_total": 0
     })
 
+@app.route("/trades")
+def get_trades():
+
+    try:
+
+        url = BASE_URL + "/api/v2/mix/position/all-position"
+
+        timestamp = str(int(time.time() * 1000))
+
+        params = "productType=USDT-FUTURES"
+
+        sign = generate_signature(timestamp, "GET", "/api/v2/mix/position/all-position", params)
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": sign,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(url + "?" + params, headers=headers)
+
+        data = response.json()
+
+        trades = []
+
+        if "data" in data:
+
+            for pos in data["data"]:
+
+                size = float(pos["total"])
+
+                if size > 0:
+
+                    entry = float(pos["openPriceAvg"])
+
+                    mark = float(pos["markPrice"])
+
+                    pnl = (mark - entry) * size
+
+                    trades.append({
+                        "symbol": pos["symbol"],
+                        "side": pos["holdSide"],
+                        "entry": entry,
+                        "size": size,
+                        "pnl": pnl
+                    })
+
+        return jsonify(trades)
+
+    except Exception as e:
+
+        print("Trade fetch error:", e)
+
+        return jsonify([])
+
 
 # Avvio bot
 @app.route("/start", methods=["POST"])
