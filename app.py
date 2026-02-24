@@ -485,12 +485,6 @@ open_position(
 
 break
 
-    print("Found symbols:", len(symbols))
-
-    for symbol in symbols[:10]:
-
-        print("Scanning:", symbol)
-
 def start_scanner():
 
     while True:
