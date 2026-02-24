@@ -189,9 +189,9 @@ def market_scanner_loop():
 
 def start_scanner():
     print("STARTING SCANNER THREAD...")
-    thread = threading.Thread(target=market_scanner_loop)
-    thread.daemon = True
+    thread = threading.Thread(target=market_scanner_loop, daemon=True)
     thread.start()
+    return thread
 
 import pandas as pd
 import numpy as np
@@ -302,7 +302,7 @@ def open_position(symbol, side):
 
 if __name__ == "__main__":
     print("BOOTING PERFECTBOT...")
-    start_scanner()
-    print("SCANNER THREAD STARTED")
-    app.run(host="0.0.0.0", port=10000, threaded=True)
+    scanner_thread = start_scanner()
+    print("SCANNER THREAD STARTED:", scanner_thread.is_alive())
+    app.run(host="0.0.0.0", port=10000)
 
