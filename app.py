@@ -304,5 +304,16 @@ if __name__ == "__main__":
     print("BOOTING PERFECTBOT...")
     start_scanner()
     print("SCANNER THREAD STARTED")
-    app.run(host="0.0.0.0", port=10000)
+
+    # avvia server flask
+    import threading
+    flask_thread = threading.Thread(
+        target=lambda: app.run(host="0.0.0.0", port=10000, debug=False, use_reloader=False)
+    )
+    flask_thread.daemon = True
+    flask_thread.start()
+
+    # mantiene vivo il worker per sempre
+    while True:
+        time.sleep(60)
 
