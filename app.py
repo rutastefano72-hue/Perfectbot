@@ -301,7 +301,8 @@ def open_position(symbol, side):
         print("REAL TRADE ERROR:", str(e))
 
 if __name__ == "__main__":
+    print("BOOTING PERFECTBOT...")
     start_scanner()
     print("SCANNER THREAD STARTED")
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host="0.0.0.0", port=10000, threaded=True)
 
