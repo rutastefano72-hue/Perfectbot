@@ -214,7 +214,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
 
-            "size": str(max(1, round(size))),
+            "size": str(round(size, 3)),
 
             "side": "buy" if side == "buy" else "sell",
             "tradeSide": "open",
@@ -346,7 +346,7 @@ def scan_market():
 
         capital_to_use = balance * capital_percent["value"]
 
-        position_size = (capital_to_use * LEVERAGE) / price
+        position_size = capital_to_use / price
 
         min_size = 0.01
 
