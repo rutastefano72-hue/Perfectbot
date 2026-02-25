@@ -190,11 +190,17 @@ def open_position(symbol, side, size, leverage):
             return
 
         if side == "buy":
-            stop_loss_price = round(price * (1 - STOP_LOSS_PERCENT / 100), 2)
-        take_profit_price = round(price * (1 + TAKE_PROFIT_PERCENT / 100), 2)
+            stop_loss_price = round(price * (1 - 
+        STOP_LOSS_PERCENT / 100), 2)
+            take_profit_price = round(price * (1 + 
+        TAKE_PROFIT_PERCENT / 100), 2)
         else:
-            stop_loss_price = round(price * (1 + STOP_LOSS_PERCENT / 100), 2)
-        take_profit_price = round(price * (1 - TAKE_PROFIT_PERCENT / 100), 2)
+            stop_loss_price = round(price * (1 + 
+        STOP_LOSS_PERCENT / 100), 2)
+            take_profit_price = round(price * (1 - 
+        TAKE_PROFIT_PERCENT / 100), 2)
+
+        print("SL:", stop_loss_price, "TP:", take_profit_price)
 
         request_path = "/api/v2/mix/order/place-order"
 
