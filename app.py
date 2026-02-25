@@ -328,7 +328,12 @@ def scan_market():
 
     print("Scanning symbols:", len(symbols))
 
-    for symbol in symbols[:5]:
+    for symbol in symbols:
+
+        # Controllo massimo trade attivi
+        if active_trades["count"] >= MAX_ACTIVE_TRADES:
+            print("MAX ACTIVE TRADES REACHED")
+            return
 
         signal = get_signal(symbol)
 
@@ -348,7 +353,7 @@ def scan_market():
 
         capital_to_use = balance * capital_percent["value"]
 
-        position_size = capital_to_use / price
+        position_size = (capital_to_use * LEVERAGE) / price
 
         min_size = 0.01
 
@@ -369,22 +374,16 @@ def scan_market():
         print("Side:", side)
         print("=======================================")
 
-        if active_trades["count"] >= MAX_ACTIVE_TRADES:
-    print("MAX ACTIVE TRADES REACHED")
-    return
+        open_position(
+            symbol,
+            side,
+            round(position_size, 3),
+            LEVERAGE
+        )
 
-open_position(
-    symbol,
-    side,
-    round(position_size, 3),
-    LEVERAGE
-)
+        active_trades["count"] += 1
 
-active_trades["count"] += 1
-
-print("ACTIVE TRADES:", active_trades["count"])
-
-break
+        print("ACTIVE TRADES:", active_trades["count"])
 
 # =========================
 # SCANNER LOOP
