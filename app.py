@@ -183,28 +183,40 @@ def open_position(symbol, side, size, leverage):
 
     try:
 
+        price = get_current_price(symbol)
+
+        if price is None:
+            print("Cannot get price")
+            return
+
+        if side == "buy":
+            stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
+            take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
+        else:
+            stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
+            take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
+
         request_path = "/api/v2/mix/order/place-order"
 
         timestamp = str(int(time.time() * 1000))
 
         body = {
 
-    "symbol": symbol,
-    "productType": "USDT-FUTURES",
+            "symbol": symbol,
+            "productType": "USDT-FUTURES",
+            "marginMode": "crossed",
+            "marginCoin": "USDT",
 
-    "marginMode": "crossed",
-    "marginCoin": "USDT",
+            "size": str(size),
 
-    "size": str(size),
+            "side": "buy" if side == "buy" else "sell",
+            "tradeSide": "open",
 
-    "side": "buy" if side == "buy" else "sell",
+            "orderType": "market",
+            "force": "gtc",
 
-    "posSide": "long" if side == "buy" else "short",
-
-    "tradeSide": "open",
-
-    "orderType": "market",
-    "force": "gtc"
+            "presetStopLossPrice": str(round(stop_loss_price, 6)),
+            "presetTakeProfitPrice": str(round(take_profit_price, 6))
 
         }
 
@@ -218,16 +230,19 @@ def open_position(symbol, side, size, leverage):
         )
 
         headers = {
+
             "ACCESS-KEY": API_KEY,
             "ACCESS-SIGN": signature,
             "ACCESS-TIMESTAMP": timestamp,
             "ACCESS-PASSPHRASE": PASSPHRASE,
             "Content-Type": "application/json"
+
         }
 
         url = BASE_URL + request_path
 
         print("OPENING POSITION:", symbol, side, size)
+        print("SL:", stop_loss_price, "TP:", take_profit_price)
 
         response = requests.post(
             url,
