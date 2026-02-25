@@ -242,13 +242,17 @@ def open_position(symbol, side, size, leverage):
             print("Cannot get price")
             return
 
-        # Calcolo corretto SL e TP
+        # Calcolo SL e TP corretti
         if side == "buy":
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
         else:
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
+
+        # Arrotondamento corretto per Bitget (FIX ERRORE 45115)
+        stop_loss_price = round(stop_loss_price, 6)
+        take_profit_price = round(take_profit_price, 6)
 
         print("SL:", stop_loss_price, "TP:", take_profit_price)
 
@@ -263,7 +267,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
 
-            "size": str(round(size, 3)),
+            "size": str(round(size, 2)),
 
             "side": "buy" if side == "buy" else "sell",
             "tradeSide": "open",
