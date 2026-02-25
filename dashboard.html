@@ -249,10 +249,6 @@ async function loadData(){
         document.getElementById("setCapital").value = Math.round(data.capital_percent * 100);
     }
 
-    if(document.activeElement.id !== "capital"){
-        document.getElementById("capital").value = Math.round(data.capital_percent * 100);
-    }
-
     if(document.activeElement.id !== "setLeverage"){
         document.getElementById("setLeverage").value = data.leverage;
     }
