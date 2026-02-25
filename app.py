@@ -431,6 +431,8 @@ def status():
 @app.route("/set_capital_percent", methods=["POST"])
 def set_capital_percent():
 
+    global capital_percent
+
     try:
 
         data = request.json
