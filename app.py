@@ -411,17 +411,25 @@ def stop_bot():
 
 @app.route("/status")
 def status():
-    @app.route("/set_capital_percent", methods=["POST"])
+
+    return jsonify({
+        "status": "online" if bot_running["state"] else "offline",
+        "balance": get_real_balance(),
+        "capital_percent": capital_percent["value"]
+    })
+
+
+@app.route("/set_capital_percent", methods=["POST"])
 def set_capital_percent():
 
     try:
 
-        data = requests.json if requests else None
+        data = request.json
 
         percent = float(data.get("percent"))
 
         if percent <= 0 or percent > 1:
-            return jsonify({"success": False, "error": "Invalid percent"})
+            return jsonify({"success": False})
 
         capital_percent["value"] = percent
 
@@ -431,11 +439,9 @@ def set_capital_percent():
 
     except Exception as e:
 
-        return jsonify({"success": False, "error": str(e)})
+        print("ERROR:", e)
 
-    return jsonify({
-        "status": "online" if bot_running["state"] else "offline",
-        "balance": get_real_balance()
+        return jsonify({"success": False})
     })
 
 # =========================
