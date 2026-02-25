@@ -442,7 +442,6 @@ def set_capital_percent():
         print("ERROR:", e)
 
         return jsonify({"success": False})
-    })
 
 # =========================
 # START THREAD
