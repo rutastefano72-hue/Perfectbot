@@ -312,19 +312,20 @@ async function saveCapital(){
 
     let value = document.getElementById("setCapital").value;
 
-    console.log("SENDING CAPITAL:", value);
-
     let res = await fetch("/set_capital_percent",{
         method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({percent: parseFloat(value)/100})
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            percent: parseFloat(value) / 100
+        })
     });
 
     let data = await res.json();
 
-    console.log("SERVER RESPONSE:", data);
+    console.log("SAVE CAPITAL RESPONSE:", data);
 
-    loadData();
 }
 
 loadData();
