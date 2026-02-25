@@ -267,7 +267,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
 
-            "size": str(round(size, 2)),
+            "size": str(round(size, 5)),
 
             "side": "buy" if side == "buy" else "sell",
             "tradeSide": "open",
