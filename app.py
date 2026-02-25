@@ -242,16 +242,13 @@ def open_position(symbol, side, size, leverage):
             print("Cannot get price")
             return
 
+        # Calcolo corretto SL e TP
         if side == "buy":
-            stop_loss_price = round(price * (1 - 
-        STOP_LOSS_PERCENT / 100), 2)
-            take_profit_price = round(price * (1 + 
-        TAKE_PROFIT_PERCENT / 100), 2)
+            stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
+            take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
         else:
-            stop_loss_price = round(price * (1 + 
-        STOP_LOSS_PERCENT / 100), 2)
-            take_profit_price = round(price * (1 - 
-        TAKE_PROFIT_PERCENT / 100), 2)
+            stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
+            take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
 
         print("SL:", stop_loss_price, "TP:", take_profit_price)
 
@@ -274,8 +271,8 @@ def open_position(symbol, side, size, leverage):
             "orderType": "market",
             "force": "gtc",
 
-            "presetStopLossPrice": str(round(stop_loss_price, 6)),
-            "presetTakeProfitPrice": str(round(take_profit_price, 6))
+            "presetStopLossPrice": str(stop_loss_price),
+            "presetTakeProfitPrice": str(take_profit_price)
 
         }
 
