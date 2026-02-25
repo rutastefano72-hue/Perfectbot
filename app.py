@@ -10,7 +10,7 @@ import threading
 import pandas as pd
 import numpy as np
 
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 
 # =========================
 # CONFIG
@@ -437,7 +437,6 @@ def set_capital_percent():
     global capital_percent
 
     try:
-
         data = request.json
 
         percent = float(data.get("percent", capital_percent["value"]))
