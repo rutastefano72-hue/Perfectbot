@@ -380,12 +380,12 @@ def scan_market():
 
     for symbol in symbols:
 
-        # Controllo massimo trade attivi
+        # aggiorna numero trade reali aperti
         active_trades["count"] = get_open_positions_count()
 
-if active_trades["count"] >= MAX_ACTIVE_TRADES:
-    print("MAX ACTIVE TRADES REACHED")
-    return
+        if active_trades["count"] >= MAX_ACTIVE_TRADES:
+            print("MAX ACTIVE TRADES REACHED")
+            return
 
         signal = get_signal(symbol)
 
