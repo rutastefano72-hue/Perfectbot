@@ -248,6 +248,11 @@ document.getElementById("profitTotal").innerText="$"+data.profit_total;
 
 document.getElementById("status").innerText=data.status;
 
+document.getElementById("setCapital").value = data.capital_percent * 100;
+document.getElementById("setLeverage").value = data.leverage;
+document.getElementById("setTP").value = data.take_profit;
+document.getElementById("setSL").value = data.stop_loss;
+
 }
 
 async function startBot(){
