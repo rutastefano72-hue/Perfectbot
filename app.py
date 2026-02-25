@@ -242,7 +242,7 @@ def open_position(symbol, side, size, leverage):
             print("Cannot get price")
             return
 
-        # Calcolo SL e TP corretti
+        # calcolo SL e TP
         if side == "buy":
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
@@ -250,9 +250,9 @@ def open_position(symbol, side, size, leverage):
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
 
-        # Arrotondamento corretto per Bitget (FIX ERRORE 45115)
-        stop_loss_price = round(stop_loss_price, 6)
-        take_profit_price = round(take_profit_price, 6)
+        # arrotondamento corretto compatibile Bitget
+        stop_loss_price = float(f"{stop_loss_price:.6f}")
+        take_profit_price = float(f"{take_profit_price:.6f}")
 
         print("SL:", stop_loss_price, "TP:", take_profit_price)
 
@@ -267,7 +267,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
 
-            "size": str(round(size, 5)),
+            "size": str(float(f"{size:.5f}")),
 
             "side": "buy" if side == "buy" else "sell",
             "tradeSide": "open",
@@ -302,7 +302,6 @@ def open_position(symbol, side, size, leverage):
         url = BASE_URL + request_path
 
         print("OPENING POSITION:", symbol, side, size)
-        print("SL:", stop_loss_price, "TP:", take_profit_price)
 
         response = requests.post(
             url,
