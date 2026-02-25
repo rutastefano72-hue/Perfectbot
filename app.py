@@ -23,7 +23,7 @@ API_SECRET = os.environ.get("BITGET_API_SECRET")
 PASSPHRASE = os.environ.get("BITGET_API_PASSPHRASE")
 
 LEVERAGE = 5
-CAPITAL_PERCENT_PER_TRADE = 0.60
+capital_percent = {"value": 0.30}
 STOP_LOSS_PERCENT = 2.0
 TAKE_PROFIT_PERCENT = 4.0
 TRAILING_STOP_PERCENT = 1.5
@@ -333,7 +333,7 @@ def scan_market():
 
         balance = get_real_balance()
 
-        amount_usdt = balance * CAPITAL_PERCENT_PER_TRADE
+        amount_usdt = balance * capital_percent["value"]
 
         raw_size = (amount_usdt * LEVERAGE) / price
 
@@ -411,6 +411,27 @@ def stop_bot():
 
 @app.route("/status")
 def status():
+    @app.route("/set_capital_percent", methods=["POST"])
+def set_capital_percent():
+
+    try:
+
+        data = requests.json if requests else None
+
+        percent = float(data.get("percent"))
+
+        if percent <= 0 or percent > 1:
+            return jsonify({"success": False, "error": "Invalid percent"})
+
+        capital_percent["value"] = percent
+
+        print("NEW CAPITAL PERCENT:", percent)
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+
+        return jsonify({"success": False, "error": str(e)})
 
     return jsonify({
         "status": "online" if bot_running["state"] else "offline",
