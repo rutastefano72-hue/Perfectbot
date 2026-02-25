@@ -335,46 +335,46 @@ def scan_market():
 
         price = get_current_price(symbol)
 
-if price is None:
-    continue
+        if price is None:
+            continue
 
-balance = get_real_balance()
+        balance = get_real_balance()
 
-if balance is None or balance <= 0:
-    print("Invalid balance:", balance)
-    continue
+        if balance is None or balance <= 0:
+            print("Invalid balance:", balance)
+            continue
 
-capital_to_use = balance * capital_percent["value"]
+        capital_to_use = balance * capital_percent["value"]
 
-position_size = (capital_to_use * LEVERAGE) / price
+        position_size = (capital_to_use * LEVERAGE) / price
 
-min_size = 0.01
+        min_size = 0.01
 
-if position_size < min_size:
-    print("Size too small, skipping:", symbol)
-    continue
+        if position_size < min_size:
+            print("Size too small, skipping:", symbol)
+            continue
 
-side = signal
+        side = signal
 
-print("====== POSITION SIZE CALCULATION ======")
-print("Symbol:", symbol)
-print("Balance:", balance)
-print("Capital %:", capital_percent["value"])
-print("Capital used:", capital_to_use)
-print("Leverage:", LEVERAGE)
-print("Price:", price)
-print("Position size:", position_size)
-print("Side:", side)
-print("=======================================")
+        print("====== POSITION SIZE CALCULATION ======")
+        print("Symbol:", symbol)
+        print("Balance:", balance)
+        print("Capital %:", capital_percent["value"])
+        print("Capital used:", capital_to_use)
+        print("Leverage:", LEVERAGE)
+        print("Price:", price)
+        print("Position size:", position_size)
+        print("Side:", side)
+        print("=======================================")
 
-open_position(
-    symbol,
-    side,
-    round(position_size, 3),
-    LEVERAGE
-)
+        open_position(
+            symbol,
+            side,
+            round(position_size, 3),
+            LEVERAGE
+        )
 
-break
+        break
 
 # =========================
 # SCANNER LOOP
