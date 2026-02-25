@@ -449,14 +449,14 @@ def set_capital_percent():
 
         print("NEW CAPITAL PERCENT SAVED:", capital_percent["value"], flush=True)
 
-return jsonify({
-    "success": True,
-    "capital_percent": capital_percent["value"]
-})
+        return jsonify({
+            "success": True,
+            "capital_percent": capital_percent["value"]
+        })
 
     except Exception as e:
 
-        print("ERROR:", e)
+        print("ERROR SET CAPITAL:", e, flush=True)
 
         return jsonify({"success": False})
 
