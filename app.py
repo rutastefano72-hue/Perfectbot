@@ -340,28 +340,39 @@ def scan_market():
 
         balance = get_real_balance()
 
-        amount_usdt = balance * capital_percent["value"]
+if balance is None or balance <= 0:
+    print("Invalid balance:", balance)
+    continue
 
-        raw_size = (amount_usdt * LEVERAGE) / price
+capital_to_use = balance * capital_percent["value"]
 
-        min_size = 0.01
+position_size = (capital_to_use * LEVERAGE) / price
 
-        if raw_size < min_size:
-            print("Size too small, skipping:", symbol)
-            continue
+min_size = 0.01
 
-        position_size = raw_size
+if position_size < min_size:
+    print("Size too small, skipping:", symbol)
+    continue
 
-        side = signal
+side = signal
 
-        print("Opening:", symbol, side, position_size)
+print("====== POSITION SIZE CALCULATION ======")
+print("Symbol:", symbol)
+print("Balance:", balance)
+print("Capital %:", capital_percent["value"])
+print("Capital used:", capital_to_use)
+print("Leverage:", LEVERAGE)
+print("Price:", price)
+print("Position size:", position_size)
+print("Side:", side)
+print("=======================================")
 
-        open_position(
-            symbol,
-            side,
-            round(position_size, 3),
-            LEVERAGE
-        )
+open_position(
+    symbol,
+    side,
+    round(position_size, 3),
+    LEVERAGE
+)
 
         break
 
