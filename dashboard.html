@@ -312,7 +312,7 @@ let value=document.getElementById("setCapital").value;
 await fetch("/set_capital_percent",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
-body:JSON.stringify({percent:value})
+body:JSON.stringify({percent:value/100})
 });
   }
 
