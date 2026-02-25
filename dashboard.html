@@ -252,7 +252,9 @@ if(document.activeElement.id !== "setCapital"){
     document.getElementById("setCapital").value = data.capital_percent * 100;
 }
 
+if(document.activeElement.id !== "capital"){
 document.getElementById("capital").value = data.capital_percent * 100;
+}
 
 if(document.activeElement.id !== "setLeverage"){
     document.getElementById("setLeverage").value = data.leverage;
@@ -311,19 +313,17 @@ body:JSON.stringify({value:value})
 
 async function saveCapital(){
 let value=document.getElementById("setCapital").value;
+
 await fetch("/set_capital_percent",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({percent:value/100})
 });
-  }
 
 loadData();
-
-setInterval(loadData,3000);
+}
 
 loadData();
-
 setInterval(loadData,3000);
 
 
