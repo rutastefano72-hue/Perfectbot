@@ -248,10 +248,21 @@ document.getElementById("profitTotal").innerText="$"+data.profit_total;
 
 document.getElementById("status").innerText=data.status;
 
-document.getElementById("setCapital").value = data.capital_percent * 100;
-document.getElementById("setLeverage").value = data.leverage;
-document.getElementById("setTP").value = data.take_profit;
-document.getElementById("setSL").value = data.stop_loss;
+if(document.activeElement.id !== "setCapital"){
+    document.getElementById("setCapital").value = data.capital_percent * 100;
+}
+
+if(document.activeElement.id !== "setLeverage"){
+    document.getElementById("setLeverage").value = data.leverage;
+}
+
+if(document.activeElement.id !== "setTP"){
+    document.getElementById("setTP").value = data.take_profit;
+}
+
+if(document.activeElement.id !== "setSL"){
+    document.getElementById("setSL").value = data.stop_loss;
+      }
 
 }
 
