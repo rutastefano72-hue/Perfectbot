@@ -419,6 +419,8 @@ def stop_bot():
 @app.route("/status")
 def status():
 
+    global capital_percent
+
     return jsonify({
         "status": "online" if bot_running["state"] else "offline",
         "balance": get_real_balance(),
@@ -445,9 +447,12 @@ def set_capital_percent():
 
         capital_percent["value"] = percent
 
-        print("NEW CAPITAL PERCENT:", percent)
+        print("NEW CAPITAL PERCENT SAVED:", capital_percent["value"], flush=True)
 
-        return jsonify({"success": True})
+return jsonify({
+    "success": True,
+    "capital_percent": capital_percent["value"]
+})
 
     except Exception as e:
 
