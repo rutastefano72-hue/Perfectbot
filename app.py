@@ -374,7 +374,7 @@ open_position(
             LEVERAGE
         )
 
-            break
+    break
 
 # =========================
 # SCANNER LOOP
