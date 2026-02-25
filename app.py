@@ -24,6 +24,7 @@ PASSPHRASE = os.environ.get("BITGET_API_PASSPHRASE")
 
 LEVERAGE = 5
 capital_percent = {"value": 0.10}
+print("INITIAL CAPITAL PERCENT:", capital_percent["value"])
 STOP_LOSS_PERCENT = 2.0
 TAKE_PROFIT_PERCENT = 4.0
 TRAILING_STOP_PERCENT = 1.5
