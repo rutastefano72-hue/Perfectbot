@@ -260,9 +260,96 @@ loadData();
 
 }
 
+async function saveLeverage(){
+let value=document.getElementById("setLeverage").value;
+await fetch("/set_leverage",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({value:value})
+});
+}
+
+async function saveTP(){
+let value=document.getElementById("setTP").value;
+await fetch("/set_take_profit",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({value:value})
+});
+}
+
+async function saveSL(){
+let value=document.getElementById("setSL").value;
+await fetch("/set_stop_loss",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({value:value})
+});
+}
+
+async function saveCapital(){
+let value=document.getElementById("setCapital").value;
+await fetch("/set_capital_percent",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({percent:value})
+});
+  }
+
 loadData();
 
 setInterval(loadData,3000);
+
+loadData();
+
+setInterval(loadData,3000);
+
+
+function showSettings(){
+    document.getElementById("settingsPanel").style.display="block";
+    document.getElementById("dashboardPanel").style.display="none";
+}
+
+function showDashboard(){
+    document.getElementById("settingsPanel").style.display="none";
+    document.getElementById("dashboardPanel").style.display="block";
+}
+
+async function saveLeverage(){
+    let value=document.getElementById("setLeverage").value;
+    await fetch("/set_leverage",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({value:value})
+    });
+}
+
+async function saveTP(){
+    let value=document.getElementById("setTP").value;
+    await fetch("/set_take_profit",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({value:value})
+    });
+}
+
+async function saveSL(){
+    let value=document.getElementById("setSL").value;
+    await fetch("/set_stop_loss",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({value:value})
+    });
+}
+
+async function saveCapital(){
+    let value=document.getElementById("setCapital").value;
+    await fetch("/set_capital_percent",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({percent:value})
+    });
+}
 
 </script>
 
