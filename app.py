@@ -335,10 +335,10 @@ def scan_market():
 
         price = get_current_price(symbol)
 
-        if price is None:
-            continue
+if price is None:
+    continue
 
-        balance = get_real_balance()
+balance = get_real_balance()
 
 if balance is None or balance <= 0:
     print("Invalid balance:", balance)
@@ -368,13 +368,13 @@ print("Side:", side)
 print("=======================================")
 
 open_position(
-            symbol,
-            side,
-            round(position_size, 3),
-            LEVERAGE
-        )
+    symbol,
+    side,
+    round(position_size, 3),
+    LEVERAGE
+)
 
-    break
+break
 
 # =========================
 # SCANNER LOOP
