@@ -368,13 +368,13 @@ print("Side:", side)
 print("=======================================")
 
 open_position(
-    symbol,
-    side,
-    round(position_size, 3),
-    LEVERAGE
-)
+            symbol,
+            side,
+            round(position_size, 3),
+            LEVERAGE
+        )
 
-        break
+            break
 
 # =========================
 # SCANNER LOOP
