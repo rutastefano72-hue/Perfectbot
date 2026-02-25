@@ -37,6 +37,8 @@ app = Flask(__name__)
 
 # Persistente
 bot_running = {"state": True}
+active_trades = {"count": 0}
+MAX_ACTIVE_TRADES = 5
 
 # =========================
 # DASHBOARD
@@ -367,14 +369,22 @@ def scan_market():
         print("Side:", side)
         print("=======================================")
 
-        open_position(
-            symbol,
-            side,
-            round(position_size, 3),
-            LEVERAGE
-        )
+        if active_trades["count"] >= MAX_ACTIVE_TRADES:
+    print("MAX ACTIVE TRADES REACHED")
+    return
 
-        break
+open_position(
+    symbol,
+    side,
+    round(position_size, 3),
+    LEVERAGE
+)
+
+active_trades["count"] += 1
+
+print("ACTIVE TRADES:", active_trades["count"])
+
+break
 
 # =========================
 # SCANNER LOOP
