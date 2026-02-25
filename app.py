@@ -110,6 +110,56 @@ def get_real_balance():
 
         return 0
 
+def get_open_positions_count():
+
+    try:
+
+        timestamp = str(int(time.time() * 1000))
+
+        request_path = "/api/v2/mix/position/all-position?productType=USDT-FUTURES"
+
+        signature = generate_signature(
+            timestamp,
+            "GET",
+            request_path
+        )
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
+
+        url = BASE_URL + request_path
+
+        response = requests.get(url, headers=headers)
+
+        data = response.json()
+
+        if data.get("code") != "00000":
+            return 0
+
+        positions = data.get("data", [])
+
+        count = 0
+
+        for pos in positions:
+
+            size = float(pos.get("total", 0))
+
+            if size > 0:
+                count += 1
+
+        return count
+
+    except Exception as e:
+
+        print("Positions count error:", e)
+
+        return 0
+
 # =========================
 # PRICE
 # =========================
@@ -331,9 +381,11 @@ def scan_market():
     for symbol in symbols:
 
         # Controllo massimo trade attivi
-        if active_trades["count"] >= MAX_ACTIVE_TRADES:
-            print("MAX ACTIVE TRADES REACHED")
-            return
+        active_trades["count"] = get_open_positions_count()
+
+if active_trades["count"] >= MAX_ACTIVE_TRADES:
+    print("MAX ACTIVE TRADES REACHED")
+    return
 
         signal = get_signal(symbol)
 
