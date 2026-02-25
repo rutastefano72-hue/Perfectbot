@@ -237,38 +237,33 @@ Capital %
 
 async function loadData(){
 
-let res=await fetch("/status");
-let data=await res.json();
+    let res = await fetch("/status");
+    let data = await res.json();
 
-document.getElementById("balance").innerText="$"+data.balance;
+    document.getElementById("balance").innerText = "$" + data.balance;
+    document.getElementById("profitToday").innerText = "$" + data.profit_today;
+    document.getElementById("profitTotal").innerText = "$" + data.profit_total;
+    document.getElementById("status").innerText = data.status;
 
-document.getElementById("profitToday").innerText="$"+data.profit_today;
+    if(document.activeElement.id !== "setCapital"){
+        document.getElementById("setCapital").value = Math.round(data.capital_percent * 100);
+    }
 
-document.getElementById("profitTotal").innerText="$"+data.profit_total;
+    if(document.activeElement.id !== "capital"){
+        document.getElementById("capital").value = Math.round(data.capital_percent * 100);
+    }
 
-document.getElementById("status").innerText=data.status;
+    if(document.activeElement.id !== "setLeverage"){
+        document.getElementById("setLeverage").value = data.leverage;
+    }
 
-if(document.activeElement.id !== "setCapital"){
-    document.getElementById("setCapital").value =
-        Math.round(data.capital_percent * 100);
-}
+    if(document.activeElement.id !== "setTP"){
+        document.getElementById("setTP").value = data.take_profit;
+    }
 
-if(document.activeElement.id !== "capital"){
-    document.getElementById("capital").value =
-        Math.round(data.capital_percent * 100);
-}
-
-if(document.activeElement.id !== "setLeverage"){
-    document.getElementById("setLeverage").value = data.leverage;
-}
-
-if(document.activeElement.id !== "setTP"){
-    document.getElementById("setTP").value = data.take_profit;
-}
-
-if(document.activeElement.id !== "setSL"){
-    document.getElementById("setSL").value = data.stop_loss;
-      }
+    if(document.activeElement.id !== "setSL"){
+        document.getElementById("setSL").value = data.stop_loss;
+    }
 
 }
 
