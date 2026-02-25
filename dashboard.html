@@ -342,33 +342,6 @@ function showDashboard(){
     document.getElementById("dashboardPanel").style.display="block";
 }
 
-async function saveLeverage(){
-    let value=document.getElementById("setLeverage").value;
-    await fetch("/set_leverage",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({value:value})
-    });
-}
-
-async function saveTP(){
-    let value=document.getElementById("setTP").value;
-    await fetch("/set_take_profit",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({value:value})
-    });
-}
-
-async function saveSL(){
-    let value=document.getElementById("setSL").value;
-    await fetch("/set_stop_loss",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({value:value})
-    });
-}
-
 </script>
 
 <div class="main" id="settingsPanel" style="display:none;">
