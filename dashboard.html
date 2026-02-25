@@ -162,7 +162,7 @@ SL %
 <input id="sl" value="2">
 
 Capital %
-<input id="capital" value="10">
+<input id="capital" disabled>
 
 </div>
 
@@ -263,6 +263,8 @@ if(document.activeElement.id !== "setTP"){
 if(document.activeElement.id !== "setSL"){
     document.getElementById("setSL").value = data.stop_loss;
       }
+
+document.getElementById("capital").value = data.capital_percent * 100;
 
 }
 
