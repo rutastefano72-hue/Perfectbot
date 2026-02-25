@@ -449,6 +449,47 @@ def set_capital_percent():
 
         return jsonify({"success": False})
 
+@app.route("/set_leverage", methods=["POST"])
+def set_leverage():
+    try:
+        data = request.json
+        value = float(data.get("value"))
+        global LEVERAGE
+        LEVERAGE = value
+        print("NEW LEVERAGE:", value)
+        return jsonify({"success": True})
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"success": False})
+
+
+@app.route("/set_stop_loss", methods=["POST"])
+def set_stop_loss():
+    try:
+        data = request.json
+        value = float(data.get("value"))
+        global STOP_LOSS_PERCENT
+        STOP_LOSS_PERCENT = value
+        print("NEW STOP LOSS:", value)
+        return jsonify({"success": True})
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"success": False})
+
+
+@app.route("/set_take_profit", methods=["POST"])
+def set_take_profit():
+    try:
+        data = request.json
+        value = float(data.get("value"))
+        global TAKE_PROFIT_PERCENT
+        TAKE_PROFIT_PERCENT = value
+        print("NEW TAKE PROFIT:", value)
+        return jsonify({"success": True})
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"success": False})
+
 # =========================
 # START THREAD
 # =========================
