@@ -438,7 +438,7 @@ def set_capital_percent():
 
         data = request.json
 
-        percent = float(data.get("percent"))
+        percent = float(data.get("percent", capital_percent["value"]))
 
         if percent <= 0 or percent > 1:
             return jsonify({"success": False})
