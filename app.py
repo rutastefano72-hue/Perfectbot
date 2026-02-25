@@ -421,7 +421,10 @@ def status():
     return jsonify({
         "status": "online" if bot_running["state"] else "offline",
         "balance": get_real_balance(),
-        "capital_percent": capital_percent["value"]
+        "capital_percent": capital_percent["value"],
+        "leverage": LEVERAGE,
+        "take_profit": TAKE_PROFIT_PERCENT,
+        "stop_loss": STOP_LOSS_PERCENT
     })
 
 
