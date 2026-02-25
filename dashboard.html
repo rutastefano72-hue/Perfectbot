@@ -115,9 +115,13 @@ width:70px;
 
 <button class="refresh" onclick="loadData()">REFRESH DATA</button>
 
+<button class="ai" onclick="showSettings()">SETTINGS</button>
+  
+<button class="start" onclick="showDashboard()">DASHBOARD</button>
+
 </div>
 
-<div class="main">
+<div class="main" id="dashboardPanel">
 
 <div class="top">
 
@@ -352,6 +356,31 @@ async function saveCapital(){
 }
 
 </script>
+
+<div class="main" id="settingsPanel" style="display:none;">
+
+<div class="section">
+<h3>Settings</h3>
+
+Leverage
+<input id="setLeverage" value="5">
+<button onclick="saveLeverage()">Save</button>
+
+TP %
+<input id="setTP" value="4">
+<button onclick="saveTP()">Save</button>
+
+SL %
+<input id="setSL" value="2">
+<button onclick="saveSL()">Save</button>
+
+Capital %
+<input id="setCapital" value="10">
+<button onclick="saveCapital()">Save</button>
+
+</div>
+
+</div>
 
 
 </body>
