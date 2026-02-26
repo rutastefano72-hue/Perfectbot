@@ -24,6 +24,7 @@ PASSPHRASE = os.environ.get("BITGET_API_PASSPHRASE")
 
 LEVERAGE = 5
 capital_percent = {"value": 0.10}
+last_trade_time = None
 print("INITIAL CAPITAL PERCENT:", capital_percent["value"])
 STOP_LOSS_PERCENT = 2.0
 TAKE_PROFIT_PERCENT = 4.0
@@ -420,16 +421,26 @@ def get_signal(symbol):
 
 def scan_market():
 
+    global last_trade_time
+
     symbols = get_market_symbols()
 
     print("Scanning symbols:", len(symbols))
 
     trade_opened = False
 
+    # protezione: attendi almeno 60 secondi tra un trade e l'altro
+    current_time = time.time()
+
+    if last_trade_time is not None:
+        elapsed = current_time - last_trade_time
+        if elapsed < 60:
+            print("Waiting cooldown:", int(60 - elapsed), "seconds remaining")
+            return
+
     for symbol in symbols:
 
-        # aggiorna numero trade reali aperti
-        active_trades["count"] = get_open_positions_count()
+        active_trades = get_open_positions_count()
 
         print("REAL ACTIVE POSITIONS:", active_trades["count"])
 
@@ -437,7 +448,6 @@ def scan_market():
             print("MAX ACTIVE TRADES REACHED")
             return
 
-        # BLOCCO: max 1 trade per scan
         if trade_opened:
             print("Trade already opened this scan")
             return
@@ -470,7 +480,7 @@ def scan_market():
 
         side = signal
 
-        print("======== POSITION SIZE CALCULATION ========")
+        print("======= POSITION SIZE CALCULATION =======")
         print("Symbol:", symbol)
         print("Balance:", balance)
         print("Capital %:", capital_percent["value"])
@@ -479,7 +489,7 @@ def scan_market():
         print("Price:", price)
         print("Position size:", position_size)
         print("Side:", side)
-        print("==========================================")
+        print("========================================")
 
         open_position(
             symbol,
@@ -493,6 +503,8 @@ def scan_market():
         print("TRADE OPENED:", symbol, side)
 
         trade_opened = True
+
+        last_trade_time = time.time()
 
         return
 
