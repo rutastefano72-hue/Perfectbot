@@ -166,6 +166,7 @@ Math.round((data.capital_percent || 0.05) * 100);
 // POSITIONS
 let posRes = await fetch("/get_open_positions");
 let positions = await posRes.json();
+  if(!positions) positions = [];
 
 let table = document.getElementById("liveTradesTable");
 table.innerHTML="";
