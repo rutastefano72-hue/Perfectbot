@@ -322,25 +322,91 @@ def get_signal(symbol):
 
         data = response.json()
 
-        closes=np.array([float(c[4]) for c in data["data"]])
+        candles = data["data"]
 
-        ema50=pd.Series(closes).ewm(span=50).mean().iloc[-1]
+        closes = np.array([float(c[4]) for c in candles])
+        volumes = np.array([float(c[5]) for c in candles])
 
-        ema200=pd.Series(closes).ewm(span=200).mean().iloc[-1]
+        price = closes[-1]
 
-        price=closes[-1]
+        # EMA
+        ema20 = pd.Series(closes).ewm(span=20).mean().iloc[-1]
+        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
+        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
 
-        if price>ema50>ema200:
+        # RSI
+        delta = pd.Series(closes).diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
 
+        avg_gain = gain.rolling(14).mean()
+        avg_loss = loss.rolling(14).mean()
+
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        rsi = rsi.iloc[-1]
+
+        # MACD
+        ema12 = pd.Series(closes).ewm(span=12).mean()
+        ema26 = pd.Series(closes).ewm(span=26).mean()
+
+        macd = ema12 - ema26
+        signal = macd.ewm(span=9).mean()
+
+        macd_value = macd.iloc[-1]
+        signal_value = signal.iloc[-1]
+
+        # Volume
+        volume_current = volumes[-1]
+        volume_avg = volumes[-20:].mean()
+
+        score_buy = 0
+        score_sell = 0
+
+        # Trend
+        if ema50 > ema200:
+            score_buy += 1
+        if ema50 < ema200:
+            score_sell += 1
+
+        # RSI
+        if 50 < rsi < 70:
+            score_buy += 1
+        if 30 < rsi < 50:
+            score_sell += 1
+
+        # MACD
+        if macd_value > signal_value:
+            score_buy += 1
+        if macd_value < signal_value:
+            score_sell += 1
+
+        # Momentum
+        if price > ema20:
+            score_buy += 1
+        if price < ema20:
+            score_sell += 1
+
+        # Volume confirmation
+        if volume_current > volume_avg:
+            score_buy += 1
+            score_sell += 1
+
+        print(f"{symbol} SCORE BUY: {score_buy} | SCORE SELL: {score_sell}", flush=True)
+
+        if score_buy >= 4:
+            print(f"{symbol} SIGNAL: BUY CONFIRMED", flush=True)
             return "buy"
 
-        if price<ema50<ema200:
-
+        if score_sell >= 4:
+            print(f"{symbol} SIGNAL: SELL CONFIRMED", flush=True)
             return "sell"
 
         return None
 
-    except:
+    except Exception as e:
+
+        print("Signal error:", str(e), flush=True)
 
         return None
 
