@@ -320,95 +320,107 @@ def get_signal(symbol):
         url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=5m&limit=200&productType=USDT-FUTURES"
 
         response = requests.get(url)
-
         data = response.json()
+
+        if "data" not in data:
+            return None
 
         candles = data["data"]
 
         closes = np.array([float(c[4]) for c in candles])
-        volumes = np.array([float(c[5]) for c in candles])
+
+        ema50 = pd.Series(closes).ewm(span=50).mean()
+        ema200 = pd.Series(closes).ewm(span=200).mean()
 
         price = closes[-1]
-
-        # EMA
-        ema20 = pd.Series(closes).ewm(span=20).mean().iloc[-1]
-        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
-        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
-
-        # RSI
-        delta = pd.Series(closes).diff()
-        gain = delta.clip(lower=0)
-        loss = -delta.clip(upper=0)
-
-        avg_gain = gain.rolling(14).mean()
-        avg_loss = loss.rolling(14).mean()
-
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-        rsi = rsi.iloc[-1]
-
-        # MACD
-        ema12 = pd.Series(closes).ewm(span=12).mean()
-        ema26 = pd.Series(closes).ewm(span=26).mean()
-
-        macd = ema12 - ema26
-        signal = macd.ewm(span=9).mean()
-
-        macd_value = macd.iloc[-1]
-        signal_value = signal.iloc[-1]
-
-        # Volume
-        volume_current = volumes[-1]
-        volume_avg = volumes[-20:].mean()
 
         score_buy = 0
         score_sell = 0
 
-        # Trend
-        if ema50 > ema200:
+        # EMA trend
+        if ema50.iloc[-1] > ema200.iloc[-1]:
             score_buy += 1
-        if ema50 < ema200:
+        if ema50.iloc[-1] < ema200.iloc[-1]:
+            score_sell += 1
+
+        # Price above/below EMA50
+        if price > ema50.iloc[-1]:
+            score_buy += 1
+        if price < ema50.iloc[-1]:
             score_sell += 1
 
         # RSI
-        if 50 < rsi < 70:
+        delta = np.diff(closes)
+        gain = np.where(delta > 0, delta, 0)
+        loss = np.where(delta < 0, -delta, 0)
+
+        avg_gain = pd.Series(gain).rolling(14).mean().iloc[-1]
+        avg_loss = pd.Series(loss).rolling(14).mean().iloc[-1]
+
+        if avg_loss == 0:
+            rsi = 100
+        else:
+            rs = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + rs))
+
+        if rsi > 55:
             score_buy += 1
-        if 30 < rsi < 50:
+        if rsi < 45:
             score_sell += 1
 
-        # MACD
-        if macd_value > signal_value:
-            score_buy += 1
-        if macd_value < signal_value:
-            score_sell += 1
-
-        # Momentum
-        if price > ema20:
-            score_buy += 1
-        if price < ema20:
-            score_sell += 1
-
-        # Volume confirmation
-        if volume_current > volume_avg:
-            score_buy += 1
-            score_sell += 1
-
+        # Log score
         print(f"{symbol} SCORE BUY: {score_buy} | SCORE SELL: {score_sell}", flush=True)
 
-        if score_buy >= 4:
-            print(f"{symbol} SIGNAL: BUY CONFIRMED", flush=True)
+        # 🔥 HIGHER TIMEFRAME FILTER
+        htf_trend = get_higher_timeframe_trend(symbol)
+
+        if score_buy >= 4 and htf_trend == "buy":
+            print(f"{symbol} SIGNAL: BUY CONFIRMED (HTF aligned)", flush=True)
             return "buy"
 
-        if score_sell >= 4:
-            print(f"{symbol} SIGNAL: SELL CONFIRMED", flush=True)
+        if score_sell >= 4 and htf_trend == "sell":
+            print(f"{symbol} SIGNAL: SELL CONFIRMED (HTF aligned)", flush=True)
+            return "sell"
+
+        print(f"{symbol} rejected by HTF filter", flush=True)
+        return None
+
+    except Exception as e:
+
+        print("Signal error:", str(e), flush=True)
+        traceback.print_exc()
+        return None
+
+def get_higher_timeframe_trend(symbol):
+
+    try:
+
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=15m&limit=200&productType=USDT-FUTURES"
+
+        response = requests.get(url)
+        data = response.json()
+
+        if "data" not in data:
+            return None
+
+        candles = data["data"]
+
+        closes = np.array([float(c[4]) for c in candles])
+
+        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
+        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
+
+        if ema50 > ema200:
+            return "buy"
+
+        if ema50 < ema200:
             return "sell"
 
         return None
 
     except Exception as e:
 
-        print("Signal error:", str(e), flush=True)
-
+        print("HTF error:", str(e), flush=True)
         return None
 
 
