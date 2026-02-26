@@ -519,12 +519,6 @@ if __name__ == "__main__":
 
     print("PerfectBot starting...", flush=True)
 
-    global scanner_thread
-
-    scanner_thread = threading.Thread(target=scanner_loop)
-    scanner_thread.daemon = True
-    scanner_thread.start()
-
     print("Scanner thread started at boot", flush=True)
 
     port = int(os.environ.get("PORT", 10000))
