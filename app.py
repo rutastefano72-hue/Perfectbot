@@ -569,33 +569,37 @@ def scan_market():
 
 def scanner_loop():
 
-    print("SCANNER STARTED")
+    print("SCANNER STARTED", flush=True)
 
     while True:
 
         try:
 
-            print("BOT STATE:", bot_running["state"])
+            print("BOT STATE:", bot_running["state"], flush=True)
 
             if bot_running["state"]:
 
-                print("SCANNING MARKET NOW...")
+                print("SCANNING MARKET NOW...", flush=True)
 
                 scan_market()
 
-                print("SCAN COMPLETE — waiting 60 seconds")
+                print("SCAN COMPLETE — waiting 60 seconds", flush=True)
 
                 time.sleep(60)
 
             else:
 
-                print("BOT OFF")
+                print("BOT OFF", flush=True)
 
                 time.sleep(5)
 
         except Exception as e:
 
-            print("SCANNER ERROR:", e)
+            import traceback
+
+            print("SCANNER ERROR:", str(e), flush=True)
+
+            traceback.print_exc()
 
             time.sleep(10)
 
