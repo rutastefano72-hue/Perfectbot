@@ -463,6 +463,38 @@ def detect_market_regime(symbol):
         print("Regime error:", str(e), flush=True)
         return "NO_TRADE"
 
+def get_higher_timeframe_trend(symbol):
+
+    try:
+
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=1h&limit=200&productType=USDT-FUTURES"
+
+        response = requests.get(url)
+        data = response.json()
+
+        if "data" not in data:
+            return None
+
+        candles = data["data"]
+
+        closes = np.array([float(c[4]) for c in candles])
+
+        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
+        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
+
+        if ema50 > ema200:
+            return "buy"
+
+        if ema50 < ema200:
+            return "sell"
+
+        return None
+
+    except Exception as e:
+
+        print("HTF error:", str(e), flush=True)
+        return None
+
 
 # =========================
 # SCAN MARKET
