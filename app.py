@@ -275,28 +275,29 @@ def open_position(symbol, side, size, leverage):
 
         price_precision, size_precision = get_symbol_precision(symbol)
 
+        size_format = "{:." + str(size_precision) + "f}"
+        price_format = "{:." + str(price_precision) + "f}"
+
+        size = float(size_format.format(size))
+
         if side == "buy":
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
             stop_side = "sell"
+
         else:
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
             stop_side = "buy"
 
-        price_format = "{:." + str(price_precision) + "f}"
-        size_format = "{:." + str(size_precision) + "f}"
-
         stop_loss_price = float(price_format.format(stop_loss_price))
         take_profit_price = float(price_format.format(take_profit_price))
-        size = float(size_format.format(size))
 
         print("OPENING POSITION:", symbol, side, size)
         print("SL:", stop_loss_price)
         print("TP:", take_profit_price)
 
         request_path = "/api/v2/mix/order/place-order"
-
         timestamp = str(int(time.time() * 1000))
 
         body = {
@@ -305,7 +306,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
             "size": str(size),
-            "side": "buy" if side == "buy" else "sell",
+            "side": side,
             "tradeSide": "open",
             "orderType": "market",
             "force": "gtc"
@@ -330,20 +331,35 @@ def open_position(symbol, side, size, leverage):
 
         url = BASE_URL + request_path
 
-        response = requests.post(
-            url,
-            headers=headers,
-            data=body_json
-        )
+        response = requests.post(url, headers=headers, data=body_json)
 
         print("POSITION RESPONSE:", response.text)
 
-        time.sleep(1)
+        response_data = response.json()
 
-        # STOP LOSS ORDER
+        if response_data.get("code") != "00000":
+            print("POSITION FAILED")
+            return
+
+        order_id = response_data["data"]["orderId"]
+
+        # STOP LOSS
+        set_stop_loss(symbol, stop_loss_price, stop_side, size)
+
+        # TAKE PROFIT
+        set_take_profit(symbol, take_profit_price, stop_side, size)
+
+        print("TRADE OPENED:", symbol, side)
+
+    except Exception as e:
+        print("OPEN POSITION ERROR:", e)
+        traceback.print_exc()
+
+def set_stop_loss(symbol, stop_price, side, size):
+
+    try:
 
         request_path = "/api/v2/mix/order/place-tpsl-order"
-
         timestamp = str(int(time.time() * 1000))
 
         body = {
@@ -351,9 +367,10 @@ def open_position(symbol, side, size, leverage):
             "productType": "USDT-FUTURES",
             "marginCoin": "USDT",
             "planType": "loss_plan",
-            "triggerPrice": str(stop_loss_price),
-            "executePrice": str(stop_loss_price),
-            "holdSide": "long" if side == "buy" else "short"
+            "triggerPrice": str(stop_price),
+            "executePrice": str(stop_price),
+            "holdSide": side,
+            "size": str(size)
         }
 
         body_json = json.dumps(body)
@@ -365,23 +382,28 @@ def open_position(symbol, side, size, leverage):
             body_json
         )
 
-        headers["ACCESS-SIGN"] = signature
-        headers["ACCESS-TIMESTAMP"] = timestamp
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
 
         url = BASE_URL + request_path
 
-        response = requests.post(
-            url,
-            headers=headers,
-            data=body_json
-        )
+        response = requests.post(url, headers=headers, data=body_json)
 
         print("STOP LOSS SET:", response.text)
 
-        time.sleep(1)
+    except Exception as e:
+        print("STOP LOSS ERROR:", e)
 
-        # TAKE PROFIT ORDER
+def set_take_profit(symbol, tp_price, side, size):
 
+    try:
+
+        request_path = "/api/v2/mix/order/place-tpsl-order"
         timestamp = str(int(time.time() * 1000))
 
         body = {
@@ -389,9 +411,10 @@ def open_position(symbol, side, size, leverage):
             "productType": "USDT-FUTURES",
             "marginCoin": "USDT",
             "planType": "profit_plan",
-            "triggerPrice": str(take_profit_price),
-            "executePrice": str(take_profit_price),
-            "holdSide": "long" if side == "buy" else "short"
+            "triggerPrice": str(tp_price),
+            "executePrice": str(tp_price),
+            "holdSide": side,
+            "size": str(size)
         }
 
         body_json = json.dumps(body)
@@ -403,19 +426,22 @@ def open_position(symbol, side, size, leverage):
             body_json
         )
 
-        headers["ACCESS-SIGN"] = signature
-        headers["ACCESS-TIMESTAMP"] = timestamp
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
 
-        response = requests.post(
-            url,
-            headers=headers,
-            data=body_json
-        )
+        url = BASE_URL + request_path
+
+        response = requests.post(url, headers=headers, data=body_json)
 
         print("TAKE PROFIT SET:", response.text)
 
     except Exception as e:
-        print("OPEN POSITION ERROR:", e)
+        print("TAKE PROFIT ERROR:", e)
 
 # =========================
 # SIGNAL
