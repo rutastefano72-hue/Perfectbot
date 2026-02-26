@@ -184,7 +184,7 @@ Capital %
 
 </thead>
 
-<tbody id="trades">
+<tbody id="liveTradesTable">
 
 <tr>
 <td>No trades</td>
@@ -260,6 +260,34 @@ async function loadData(){
     if(document.activeElement.id !== "setSL"){
         document.getElementById("setSL").value = data.stop_loss;
     }
+
+  // ============================
+// LOAD LIVE POSITIONS
+// ============================
+
+let posRes = await fetch("/get_open_positions");
+let positions = await posRes.json();
+
+let table = document.getElementById("liveTradesTable");
+
+if(table){
+
+    table.innerHTML = "";
+
+    positions.forEach(pos => {
+
+        table.innerHTML += `
+        <tr>
+            <td>${pos.symbol}</td>
+            <td>${pos.side}</td>
+            <td>${pos.entry}</td>
+            <td>${pos.pnl}</td>
+        </tr>
+        `;
+
+    });
+
+}
 
 }
 
