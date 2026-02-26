@@ -337,15 +337,17 @@ def get_signal(symbol):
         score_buy = 0
         score_sell = 0
 
-        # EMA trend
+        # EMA Trend
         if ema50.iloc[-1] > ema200.iloc[-1]:
             score_buy += 1
+
         if ema50.iloc[-1] < ema200.iloc[-1]:
             score_sell += 1
 
-        # Price above/below EMA50
+        # Price vs EMA50
         if price > ema50.iloc[-1]:
             score_buy += 1
+
         if price < ema50.iloc[-1]:
             score_sell += 1
 
@@ -365,62 +367,48 @@ def get_signal(symbol):
 
         if rsi > 55:
             score_buy += 1
+
         if rsi < 45:
             score_sell += 1
 
-        # Log score
         print(f"{symbol} SCORE BUY: {score_buy} | SCORE SELL: {score_sell}", flush=True)
 
-        # 🔥 HIGHER TIMEFRAME FILTER
+        # =============================
+        # REGIME AI LAYER
+        # =============================
+
+        regime = detect_market_regime(symbol)
+
+        print(f"{symbol} REGIME: {regime}", flush=True)
+
+        if regime == "NO_TRADE":
+            return None
+
+        if regime == "RANGE":
+            return None
+
+        # =============================
+        # HTF FILTER
+        # =============================
+
         htf_trend = get_higher_timeframe_trend(symbol)
 
-        if score_buy >= 4 and htf_trend == "buy":
-            print(f"{symbol} SIGNAL: BUY CONFIRMED (HTF aligned)", flush=True)
+        if regime == "TREND_UP" and score_buy >= 4 and htf_trend == "buy":
+            print(f"{symbol} SIGNAL: BUY CONFIRMED (AI TREND UP)", flush=True)
             return "buy"
 
-        if score_sell >= 4 and htf_trend == "sell":
-            print(f"{symbol} SIGNAL: SELL CONFIRMED (HTF aligned)", flush=True)
+        if regime == "TREND_DOWN" and score_sell >= 4 and htf_trend == "sell":
+            print(f"{symbol} SIGNAL: SELL CONFIRMED (AI TREND DOWN)", flush=True)
             return "sell"
 
-        print(f"{symbol} rejected by HTF filter", flush=True)
+        print(f"{symbol} rejected by AI regime or HTF filter", flush=True)
+
         return None
 
     except Exception as e:
 
         print("Signal error:", str(e), flush=True)
         traceback.print_exc()
-        return None
-
-def get_higher_timeframe_trend(symbol):
-
-    try:
-
-        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=15m&limit=200&productType=USDT-FUTURES"
-
-        response = requests.get(url)
-        data = response.json()
-
-        if "data" not in data:
-            return None
-
-        candles = data["data"]
-
-        closes = np.array([float(c[4]) for c in candles])
-
-        ema50 = pd.Series(closes).ewm(span=50).mean().iloc[-1]
-        ema200 = pd.Series(closes).ewm(span=200).mean().iloc[-1]
-
-        if ema50 > ema200:
-            return "buy"
-
-        if ema50 < ema200:
-            return "sell"
-
-        return None
-
-    except Exception as e:
-
-        print("HTF error:", str(e), flush=True)
         return None
 
 
