@@ -477,8 +477,19 @@ def stop():
 # RUN
 # =========================
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
-    port=int(os.environ.get("PORT",10000))
+    print("PerfectBot starting...", flush=True)
 
-    app.run(host="0.0.0.0",port=port)
+    thread = threading.Thread(target=scanner_loop)
+    thread.daemon = True
+    thread.start()
+
+    port = int(os.environ.get("PORT", 10000))
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        use_reloader=False
+    )
