@@ -406,13 +406,43 @@ def scan_market():
 
 def get_market_symbols():
 
-    url=BASE_URL+"/api/v2/mix/market/contracts?productType=USDT-FUTURES"
+    try:
 
-    response=requests.get(url)
+        url = BASE_URL + "/api/v2/mix/market/tickers?productType=USDT-FUTURES"
 
-    data=response.json()
+        response = requests.get(url)
 
-    return [x["symbol"] for x in data["data"] if x["symbol"].endswith("USDT")]
+        data = response.json()
+
+        symbols_data = []
+
+        if data.get("code") == "00000":
+
+            for item in data["data"]:
+
+                symbol = item.get("symbol")
+
+                volume = float(item.get("baseVolume", 0))
+
+                if symbol.endswith("USDT"):
+
+                    symbols_data.append((symbol, volume))
+
+        # Ordina per volume decrescente
+        symbols_data.sort(key=lambda x: x[1], reverse=True)
+
+        # Prendi solo le prime 25
+        top_25 = [x[0] for x in symbols_data[:25]]
+
+        print("TOP 25 SYMBOLS SELECTED:", top_25, flush=True)
+
+        return top_25
+
+    except Exception as e:
+
+        print("Error selecting top symbols:", str(e), flush=True)
+
+        return []
 
 
 # =========================
