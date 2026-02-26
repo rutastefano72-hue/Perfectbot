@@ -372,7 +372,8 @@ def set_stop_loss(symbol, stop_price, side, size):
             "executePrice": str(stop_price),
             "holdSide": side,
             "size": str(size),
-            "triggerType": "mark_price"
+            "triggerType": "mark_price",
+            "delegateType": "close"
         }
 
         body_json = json.dumps(body)
@@ -394,12 +395,18 @@ def set_stop_loss(symbol, stop_price, side, size):
 
         url = BASE_URL + request_path
 
-        response = requests.post(url, headers=headers, data=body_json)
+        response = requests.post(
+            url,
+            headers=headers,
+            data=body_json
+        )
 
         print("STOP LOSS SET:", response.text)
 
     except Exception as e:
+
         print("STOP LOSS ERROR:", e)
+        traceback.print_exc()
 
 def set_take_profit(symbol, tp_price, side, size):
 
@@ -417,7 +424,8 @@ def set_take_profit(symbol, tp_price, side, size):
             "executePrice": str(tp_price),
             "holdSide": side,
             "size": str(size),
-            "triggerType": "mark_price"
+            "triggerType": "mark_price",
+            "delegateType": "close"
         }
 
         body_json = json.dumps(body)
@@ -439,12 +447,18 @@ def set_take_profit(symbol, tp_price, side, size):
 
         url = BASE_URL + request_path
 
-        response = requests.post(url, headers=headers, data=body_json)
+        response = requests.post(
+            url,
+            headers=headers,
+            data=body_json
+        )
 
         print("TAKE PROFIT SET:", response.text)
 
     except Exception as e:
+
         print("TAKE PROFIT ERROR:", e)
+        traceback.print_exc()
 
 # =========================
 # SIGNAL
