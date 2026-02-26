@@ -1,281 +1,247 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PerfectBot Terminal</title><style>
+<title>PerfectBot AI Terminal</title>
+
+<style>
+
 body{
-margin:0;
-font-family:Arial;
-background:#0b1220;
-color:white;
-display:flex;
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background:#0a0f1c;
+    color:#e0e6ff;
+    display:flex;
 }
 
+/* SIDEBAR */
+
 .sidebar{
-width:200px;
-background:#020617;
-height:100vh;
-padding:20px;
+    width:220px;
+    background:linear-gradient(180deg,#0f1629,#070b14);
+    height:100vh;
+    padding:20px;
+    box-shadow:0 0 20px #00ffcc33;
 }
 
 .sidebar h2{
-font-size:18px;
-margin-bottom:20px;
+    color:#00ffc3;
+    text-shadow:0 0 10px #00ffc3;
+    margin-bottom:30px;
 }
 
 .sidebar button{
-width:100%;
-padding:12px;
-margin-bottom:10px;
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
-font-weight:bold;
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    background:#10192e;
+    border:1px solid #00ffc333;
+    border-radius:8px;
+    color:#00ffc3;
+    cursor:pointer;
+    transition:0.3s;
 }
 
-.start{background:#16a34a;}
-.stop{background:#dc2626;}
-.refresh{background:#2563eb;}
-.settings{background:#7c3aed;}
+.sidebar button:hover{
+    background:#00ffc320;
+    box-shadow:0 0 10px #00ffc3;
+}
+
+/* MAIN */
 
 .main{
-flex:1;
-padding:25px;
+    flex:1;
+    padding:30px;
 }
 
 .top{
-display:flex;
-gap:20px;
+    display:flex;
+    gap:20px;
 }
 
 .card{
-background:#020617;
-padding:20px;
-border-radius:12px;
-flex:1;
+    flex:1;
+    background:#0f1629;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #00ffc320;
+    box-shadow:0 0 15px #00ffc310;
+}
+
+.card h3{
+    color:#00ffc3;
+    margin:0;
 }
 
 .value{
-font-size:22px;
-margin-top:8px;
-font-weight:bold;
+    font-size:26px;
+    margin-top:10px;
+    font-weight:bold;
 }
+
+/* SECTIONS */
 
 .section{
-margin-top:25px;
-background:#020617;
-padding:20px;
-border-radius:12px;
+    margin-top:30px;
+    background:#0f1629;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #00ffc320;
 }
+
+/* TABLE */
 
 table{
-width:100%;
-border-collapse:collapse;
+    width:100%;
+    border-collapse:collapse;
 }
 
-th,td{
-padding:12px;
-border-bottom:1px solid #1f2937;
-text-align:left;
+th{
+    color:#00ffc3;
+    text-align:left;
+    padding-bottom:10px;
 }
 
-input{
-background:#0b1220;
-border:1px solid #1f2937;
-color:white;
-padding:6px;
-border-radius:6px;
-width:80px;
-margin-right:8px;
+td{
+    padding:10px 0;
+    border-bottom:1px solid #1c2744;
 }
 
-button.small{
-padding:6px 10px;
-font-size:12px;
-border-radius:6px;
-}
-</style></head><body><div class="sidebar"><h2>PerfectBot</h2><button class="start" onclick="startBot()">START BOT</button>
-<button class="stop" onclick="stopBot()">STOP BOT</button>
-<button class="refresh" onclick="loadData()">REFRESH</button>
-<button class="settings" onclick="toggleSettings()">SETTINGS</button>
+/* STATUS */
 
-</div><div class="main"><div class="top"><div class="card">
-Balance
-<div id="balance" class="value">$0.00</div>
-</div><div class="card">
-Status
-<div id="status" class="value">offline</div>
-</div></div><div class="section"><h3>Live Trades</h3><table>
+.online{
+    color:#00ff88;
+    text-shadow:0 0 10px #00ff88;
+}
+
+.offline{
+    color:#ff4d4d;
+    text-shadow:0 0 10px #ff4d4d;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<h2>PerfectBot AI</h2>
+
+<button onclick="startBot()">START</button>
+<button onclick="stopBot()">STOP</button>
+<button onclick="loadData()">REFRESH</button>
+
+</div>
+
+<div class="main">
+
+<div class="top">
+
+<div class="card">
+<h3>Balance</h3>
+<div id="balance" class="value">$0</div>
+</div>
+
+<div class="card">
+<h3>Status</h3>
+<div id="status" class="value offline">offline</div>
+</div>
+
+<div class="card">
+<h3>AI Layer</h3>
+<div class="value">ACTIVE</div>
+</div>
+
+</div>
+
+<div class="section">
+<h3>Live Trades</h3>
+
+<table>
 <thead>
 <tr>
 <th>Symbol</th>
 <th>Side</th>
 <th>Entry</th>
 <th>PNL</th>
-<th>Action</th>
 </tr>
-</thead><tbody id="liveTradesTable">
+</thead>
+
+<tbody id="liveTradesTable">
 <tr>
-<td colspan="5">Loading...</td>
+<td colspan="4">No trades</td>
 </tr>
-</tbody></table></div><div class="section" id="settingsPanel" style="display:none;"><h3>Settings</h3>Leverage
-<input id="setLeverage">
-<button class="small" onclick="saveLeverage()">Save</button>
+</tbody>
+</table>
 
-<br><br>
+</div>
 
-TP %
-<input id="setTP">
-<button class="small" onclick="saveTP()">Save</button>
+</div>
 
-<br><br>
-
-SL %
-<input id="setSL">
-<button class="small" onclick="saveSL()">Save</button>
-
-<br><br>
-
-Capital %
-<input id="setCapital">
-<button class="small" onclick="saveCapital()">Save</button>
-
-</div></div><script>
+<script>
 
 async function loadData(){
 
-try{
+    let res = await fetch("/status");
+    let data = await res.json();
 
-// STATUS
-let res = await fetch("/status");
-let data = await res.json();
+    document.getElementById("balance").innerText = "$" + data.balance;
 
-document.getElementById("balance").innerText =
-"$" + parseFloat(data.balance || 0).toFixed(2);
+    let statusEl = document.getElementById("status");
 
-document.getElementById("status").innerText =
-data.status || "offline";
+    if(data.status === "online"){
+        statusEl.innerText = "ONLINE";
+        statusEl.className = "value online";
+    }else{
+        statusEl.innerText = "OFFLINE";
+        statusEl.className = "value offline";
+    }
 
-// set values
-document.getElementById("setLeverage").value = data.leverage || 5;
-document.getElementById("setTP").value = data.take_profit || 4;
-document.getElementById("setSL").value = data.stop_loss || 2;
-document.getElementById("setCapital").value =
-Math.round((data.capital_percent || 0.05) * 100);
+    let posRes = await fetch("/get_open_positions");
+    let positions = await posRes.json();
 
-// POSITIONS
-let posRes = await fetch("/get_open_positions");
-let positions = await posRes.json();
-  if(!positions) positions = [];
+    let table = document.getElementById("liveTradesTable");
+    table.innerHTML = "";
 
-let table = document.getElementById("liveTradesTable");
-table.innerHTML="";
+    if(positions.length === 0){
+        table.innerHTML = "<tr><td colspan='4'>No trades</td></tr>";
+        return;
+    }
 
-if(!positions || positions.length === 0){
+    positions.forEach(pos => {
 
-table.innerHTML=`
-<tr>
-<td colspan="5">No open trades</td>
-</tr>
-`;
+        let pnl = parseFloat(pos.pnl);
+        let color = pnl >= 0 ? "#00ff88" : "#ff4d4d";
+        let glow = pnl >= 0 ? "0 0 8px #00ff88" : "0 0 8px #ff4d4d";
 
-return;
-}
-
-positions.forEach(pos=>{
-
-let pnl = parseFloat(pos.pnl || 0);
-let color = pnl >= 0 ? "#00ff88" : "#ff4d4d";
-
-table.innerHTML+=`
-<tr>
-<td>${pos.symbol}</td>
-<td>${pos.side}</td>
-<td>${pos.entry}</td>
-<td style="color:${color}; font-weight:bold;">
-${pnl.toFixed(4)}
-</td>
-<td>
-<button class="small" onclick="closeTrade('${pos.symbol}')">
-Close
-</button>
-</td>
-</tr>
-`;
-
-});
-
-}catch(e){
-console.log("LOAD ERROR:",e);
-}
+        table.innerHTML += `
+        <tr>
+            <td>${pos.symbol}</td>
+            <td>${pos.side}</td>
+            <td>${pos.entry}</td>
+            <td style="color:${color}; text-shadow:${glow}; font-weight:bold;">
+                ${pnl.toFixed(4)}
+            </td>
+        </tr>
+        `;
+    });
 
 }
 
 async function startBot(){
-await fetch("/start",{method:"POST"});
-loadData();
+    await fetch("/start",{method:"POST"});
+    loadData();
 }
 
 async function stopBot(){
-await fetch("/stop",{method:"POST"});
-loadData();
-}
-
-async function saveLeverage(){
-let value=document.getElementById("setLeverage").value;
-await fetch("/set_leverage",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({value:value})
-});
-}
-
-async function saveTP(){
-let value=document.getElementById("setTP").value;
-await fetch("/set_take_profit",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({value:value})
-});
-}
-
-async function saveSL(){
-let value=document.getElementById("setSL").value;
-await fetch("/set_stop_loss",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({value:value})
-});
-}
-
-async function saveCapital(){
-let value=document.getElementById("setCapital").value;
-await fetch("/set_capital_percent",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({percent:parseFloat(value)/100})
-});
-}
-
-async function closeTrade(symbol){
-
-await fetch("/close_trade",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({symbol:symbol})
-});
-
-loadData();
-}
-
-function toggleSettings(){
-let panel=document.getElementById("settingsPanel");
-panel.style.display =
-panel.style.display==="none"?"block":"none";
+    await fetch("/stop",{method:"POST"});
+    loadData();
 }
 
 loadData();
 setInterval(loadData,3000);
 
-</script></body>
+</script>
+
+</body>
 </html>
