@@ -454,9 +454,6 @@ def scanner_loop():
             time.sleep(10)
 
 
-threading.Thread(target=scanner_loop,daemon=True).start()
-
-
 # =========================
 # API
 # =========================
