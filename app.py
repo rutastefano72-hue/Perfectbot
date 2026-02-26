@@ -322,10 +322,13 @@ def get_higher_timeframe_trend(symbol):
         response = requests.get(url)
         data = response.json()
 
-        if "data" not in data:
+        if "data" not in data or data["data"] is None:
             return None
 
         candles = data["data"]
+
+        if len(candles) < 50:
+            return None
 
         closes = np.array([float(c[4]) for c in candles])
 
