@@ -274,8 +274,6 @@ def open_position(symbol, side, size, leverage):
 
         price_precision, size_precision = get_symbol_precision(symbol)
 
-        size = round(size, size_precision)
-
         if side == "buy":
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
@@ -283,11 +281,16 @@ def open_position(symbol, side, size, leverage):
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
 
-        stop_loss_price = round(stop_loss_price, price_precision)
-        take_profit_price = round(take_profit_price, price_precision)
+        price_format = "{:0." + str(price_precision) + "f}"
+        size_format = "{:0." + str(size_precision) + "f}"
+
+        stop_loss_price = float(price_format.format(stop_loss_price))
+        take_profit_price = float(price_format.format(take_profit_price))
+        size = float(size_format.format(size))
 
         print("PRECISION USED:", price_precision, size_precision)
         print("SL:", stop_loss_price, "TP:", take_profit_price)
+        print("SIZE:", size)
 
         request_path = "/api/v2/mix/order/place-order"
 
@@ -310,6 +313,7 @@ def open_position(symbol, side, size, leverage):
 
             "presetStopLossPrice": str(stop_loss_price),
             "presetTakeProfitPrice": str(take_profit_price)
+
         }
 
         body_json = json.dumps(body)
@@ -346,8 +350,11 @@ def open_position(symbol, side, size, leverage):
         print("ORDER RESPONSE:", result)
 
         if result.get("code") == "00000":
+
             print("POSITION OPENED SUCCESSFULLY")
+
         else:
+
             print("POSITION FAILED:", result.get("msg"))
 
     except Exception as e:
@@ -496,21 +503,32 @@ def scanner_loop():
             if bot_running["state"]:
 
                 print("SCANNING MARKET NOW...")
+
                 scan_market()
+
+                print("SCAN COMPLETE — waiting 60 seconds")
+
+                time.sleep(60)
 
             else:
 
                 print("BOT OFF")
 
+                time.sleep(5)
+
         except Exception as e:
 
             print("SCANNER ERROR:", e)
 
-        time.sleep(10)
+            time.sleep(10)
 
 # =========================
 # API CONTROL
 # =========================
+
+@app.route("/")
+def home():
+    return "PerfectBot is running"
 
 @app.route("/start", methods=["POST"])
 def start_bot():
