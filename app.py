@@ -424,15 +424,22 @@ def scan_market():
 
     print("Scanning symbols:", len(symbols))
 
+    trade_opened = False
+
     for symbol in symbols:
 
-        # controllo numero reale posizioni aperte su Bitget
-        current_positions = get_open_positions_count()
+        # aggiorna numero trade reali aperti
+        active_trades["count"] = get_open_positions_count()
 
-        print("REAL ACTIVE POSITIONS:", current_positions)
+        print("REAL ACTIVE POSITIONS:", active_trades["count"])
 
-        if current_positions >= MAX_ACTIVE_TRADES:
+        if active_trades["count"] >= MAX_ACTIVE_TRADES:
             print("MAX ACTIVE TRADES REACHED")
+            return
+
+        # BLOCCO: max 1 trade per scan
+        if trade_opened:
+            print("Trade already opened this scan")
             return
 
         signal = get_signal(symbol)
@@ -449,7 +456,7 @@ def scan_market():
 
         if balance is None or balance <= 0:
             print("Invalid balance:", balance)
-            continue
+            return
 
         capital_to_use = balance * capital_percent["value"]
 
@@ -463,7 +470,7 @@ def scan_market():
 
         side = signal
 
-        print("====== POSITION SIZE CALCULATION ======")
+        print("======== POSITION SIZE CALCULATION ========")
         print("Symbol:", symbol)
         print("Balance:", balance)
         print("Capital %:", capital_percent["value"])
@@ -472,7 +479,7 @@ def scan_market():
         print("Price:", price)
         print("Position size:", position_size)
         print("Side:", side)
-        print("=======================================")
+        print("==========================================")
 
         open_position(
             symbol,
@@ -481,10 +488,13 @@ def scan_market():
             LEVERAGE
         )
 
+        active_trades["count"] += 1
+
         print("TRADE OPENED:", symbol, side)
 
-        # pausa breve per evitare spam API
-        time.sleep(0.5)
+        trade_opened = True
+
+        return
 
 # =========================
 # SCANNER LOOP
@@ -646,4 +656,13 @@ thread.start()
 
 if __name__ == "__main__":
 
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    port = int(os.environ.get("PORT", 10000))
+
+    print("STARTING PERFECTBOT SERVER ON PORT:", port)
+
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False,
+        use_reloader=False
+    )
