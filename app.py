@@ -642,17 +642,28 @@ def set_take_profit():
         print("ERROR:", e)
         return jsonify({"success": False})
 
-# =========================
+
+# ============================
+# HOME ROUTE
+# ============================
+
+@app.route("/")
+def home():
+    return "PerfectBot is running"
+
+
+# ============================
 # START THREAD
-# =========================
+# ============================
 
 thread = threading.Thread(target=scanner_loop)
 thread.daemon = True
 thread.start()
 
-# =========================
+
+# ============================
 # RUN
-# =========================
+# ============================
 
 if __name__ == "__main__":
 
