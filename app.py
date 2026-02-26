@@ -411,6 +411,58 @@ def get_signal(symbol):
         traceback.print_exc()
         return None
 
+def detect_market_regime(symbol):
+
+    try:
+
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=15m&limit=200&productType=USDT-FUTURES"
+
+        response = requests.get(url)
+        data = response.json()
+
+        if "data" not in data:
+            return "NO_TRADE"
+
+        candles = data["data"]
+
+        closes = np.array([float(c[4]) for c in candles])
+        highs = np.array([float(c[2]) for c in candles])
+        lows = np.array([float(c[3]) for c in candles])
+
+        ema50 = pd.Series(closes).ewm(span=50).mean()
+        ema200 = pd.Series(closes).ewm(span=200).mean()
+
+        ema200_slope = ema200.iloc[-1] - ema200.iloc[-10]
+
+        ema_distance = abs(ema50.iloc[-1] - ema200.iloc[-1]) / closes[-1]
+
+        tr1 = highs - lows
+        tr2 = abs(highs - np.roll(closes, 1))
+        tr3 = abs(lows - np.roll(closes, 1))
+        tr = np.maximum(tr1, np.maximum(tr2, tr3))
+        atr = pd.Series(tr).rolling(14).mean().iloc[-1] / closes[-1]
+
+        adx_strength = ema_distance * 100
+
+        if atr < 0.003:
+            return "NO_TRADE"
+
+        if adx_strength > 0.5 and ema200_slope > 0:
+            return "TREND_UP"
+
+        if adx_strength > 0.5 and ema200_slope < 0:
+            return "TREND_DOWN"
+
+        if atr > 0.02:
+            return "VOLATILE"
+
+        return "RANGE"
+
+    except Exception as e:
+
+        print("Regime error:", str(e), flush=True)
+        return "NO_TRADE"
+
 
 # =========================
 # SCAN MARKET
