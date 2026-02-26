@@ -204,17 +204,15 @@ def get_market_symbols():
 
         data = response.json()
 
-        print("RESPONSE DATA:", data)
-
         symbols = []
 
         if "data" in data:
 
             for item in data["data"]:
 
-                symbol = item["symbol"]
+                symbol = item.get("symbol")
 
-                if symbol.endswith("USDT"):
+                if symbol and symbol.endswith("USDT"):
 
                     symbols.append(symbol)
 
@@ -227,6 +225,38 @@ def get_market_symbols():
         print("Symbols error:", e)
 
         return []
+
+
+def get_symbol_precision(symbol):
+
+    try:
+
+        url = BASE_URL + "/api/v2/mix/market/contracts?productType=USDT-FUTURES"
+
+        response = requests.get(url)
+
+        data = response.json()
+
+        if "data" in data:
+
+            for item in data["data"]:
+
+                if item.get("symbol") == symbol:
+
+                    price_precision = int(item.get("pricePlace", 2))
+                    size_precision = int(item.get("volumePlace", 3))
+
+                    print("PRECISION:", symbol, price_precision, size_precision)
+
+                    return price_precision, size_precision
+
+        return 2, 3
+
+    except Exception as e:
+
+        print("Precision error:", e)
+
+        return 2, 3
 
 # =========================
 # OPEN POSITION
@@ -242,7 +272,10 @@ def open_position(symbol, side, size, leverage):
             print("Cannot get price")
             return
 
-        # calcolo SL e TP
+        price_precision, size_precision = get_symbol_precision(symbol)
+
+        size = round(size, size_precision)
+
         if side == "buy":
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
@@ -250,10 +283,10 @@ def open_position(symbol, side, size, leverage):
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
 
-        # arrotondamento corretto compatibile Bitget
-        stop_loss_price = float(f"{stop_loss_price:.6f}")
-        take_profit_price = float(f"{take_profit_price:.6f}")
+        stop_loss_price = round(stop_loss_price, price_precision)
+        take_profit_price = round(take_profit_price, price_precision)
 
+        print("PRECISION USED:", price_precision, size_precision)
         print("SL:", stop_loss_price, "TP:", take_profit_price)
 
         request_path = "/api/v2/mix/order/place-order"
@@ -267,7 +300,7 @@ def open_position(symbol, side, size, leverage):
             "marginMode": "crossed",
             "marginCoin": "USDT",
 
-            "size": str(float(f"{size:.5f}")),
+            "size": str(size),
 
             "side": "buy" if side == "buy" else "sell",
             "tradeSide": "open",
@@ -277,7 +310,6 @@ def open_position(symbol, side, size, leverage):
 
             "presetStopLossPrice": str(stop_loss_price),
             "presetTakeProfitPrice": str(take_profit_price)
-
         }
 
         body_json = json.dumps(body)
@@ -309,7 +341,14 @@ def open_position(symbol, side, size, leverage):
             data=body_json
         )
 
-        print("ORDER RESPONSE:", response.json())
+        result = response.json()
+
+        print("ORDER RESPONSE:", result)
+
+        if result.get("code") == "00000":
+            print("POSITION OPENED SUCCESSFULLY")
+        else:
+            print("POSITION FAILED:", result.get("msg"))
 
     except Exception as e:
 
