@@ -536,10 +536,6 @@ def scanner_loop():
 # API CONTROL
 # =========================
 
-@app.route("/")
-def home():
-    return "PerfectBot is running"
-
 @app.route("/start", methods=["POST"])
 def start_bot():
 
