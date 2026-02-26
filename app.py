@@ -419,10 +419,12 @@ def scan_market():
 
     for symbol in symbols:
 
-        # aggiorna numero trade reali aperti
-        active_trades["count"] = get_open_positions_count()
+        # controllo numero reale posizioni aperte su Bitget
+        current_positions = get_open_positions_count()
 
-        if active_trades["count"] >= MAX_ACTIVE_TRADES:
+        print("REAL ACTIVE POSITIONS:", current_positions)
+
+        if current_positions >= MAX_ACTIVE_TRADES:
             print("MAX ACTIVE TRADES REACHED")
             return
 
@@ -472,9 +474,10 @@ def scan_market():
             LEVERAGE
         )
 
-        active_trades["count"] += 1
+        print("TRADE OPENED:", symbol, side)
 
-        print("ACTIVE TRADES:", active_trades["count"])
+        # pausa breve per evitare spam API
+        time.sleep(0.5)
 
 # =========================
 # SCANNER LOOP
