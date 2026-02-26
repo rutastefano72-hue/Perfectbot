@@ -491,11 +491,11 @@ def get_signal(symbol):
 
         htf_trend = get_higher_timeframe_trend(symbol)
 
-        if regime == "TREND_UP" and score_buy >= 4 and htf_trend == "buy":
+        if regime == "TREND_UP" and score_buy >= 3 and htf_trend == "buy":
             print(f"{symbol} SIGNAL: BUY CONFIRMED (AI TREND UP)", flush=True)
             return "buy"
 
-        if regime == "TREND_DOWN" and score_sell >= 4 and htf_trend == "sell":
+        if regime == "TREND_DOWN" and score_sell >= 3 and htf_trend == "sell":
             print(f"{symbol} SIGNAL: SELL CONFIRMED (AI TREND DOWN)", flush=True)
             return "sell"
 
