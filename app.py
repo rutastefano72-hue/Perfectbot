@@ -40,7 +40,7 @@ print("PerfectBot starting...")
 
 app = Flask(__name__)
 
-bot_running = {"state": True}
+bot_running = {"state": False}
 
 # =========================
 # DASHBOARD
