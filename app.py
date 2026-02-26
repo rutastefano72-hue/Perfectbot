@@ -416,7 +416,7 @@ def set_take_profit(symbol, tp_price, side, size):
             "triggerPrice": str(tp_price),
             "executePrice": str(tp_price),
             "holdSide": side,
-            "size": str(size)
+            "size": str(size),
             "triggerType": "mark_price"
         }
 
