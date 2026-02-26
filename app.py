@@ -24,7 +24,7 @@ API_SECRET = os.environ.get("BITGET_API_SECRET")
 PASSPHRASE = os.environ.get("BITGET_API_PASSPHRASE")
 
 LEVERAGE = 5
-capital_percent = {"value": 0.10}
+capital_percent = {"value": 0.01}
 last_trade_time = None
 print("INITIAL CAPITAL PERCENT:", capital_percent["value"])
 STOP_LOSS_PERCENT = 2.0
