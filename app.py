@@ -41,6 +41,7 @@ print("PerfectBot starting...")
 app = Flask(__name__)
 
 bot_running = {"state": False}
+scanner_thread = None
 
 # =========================
 # DASHBOARD
@@ -489,7 +490,17 @@ def api_positions():
 @app.route("/start",methods=["POST"])
 def start():
 
-    bot_running["state"]=True
+    global scanner_thread
+
+    bot_running["state"] = True
+
+    if scanner_thread is None or not scanner_thread.is_alive():
+
+        scanner_thread = threading.Thread(target=scanner_loop)
+        scanner_thread.daemon = True
+        scanner_thread.start()
+
+        print("SCANNER THREAD STARTED FROM API", flush=True)
 
     return jsonify({"success":True})
 
@@ -510,11 +521,6 @@ def stop():
 if __name__ == "__main__":
 
     print("PerfectBot starting...", flush=True)
-
-    # START SCANNER THREAD
-    thread = threading.Thread(target=scanner_loop)
-    thread.daemon = True
-    thread.start()
 
     print("Scanner thread started", flush=True)
 
