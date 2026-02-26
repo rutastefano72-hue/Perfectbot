@@ -371,7 +371,7 @@ def set_stop_loss(symbol, stop_price, side, size):
             "triggerPrice": str(stop_price),
             "executePrice": str(stop_price),
             "holdSide": side,
-            "size": str(size)
+            "size": str(size),
             "triggerType": "mark_price"
         }
 
