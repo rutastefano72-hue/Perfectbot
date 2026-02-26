@@ -162,6 +162,62 @@ def get_open_positions_count():
 
         return 0
 
+def get_open_positions():
+
+    try:
+
+        timestamp = str(int(time.time() * 1000))
+
+        request_path = "/api/v2/mix/position/all-position?productType=USDT-FUTURES"
+
+        signature = generate_signature(
+            timestamp,
+            "GET",
+            request_path
+        )
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
+
+        url = BASE_URL + request_path
+
+        response = requests.get(url, headers=headers)
+
+        data = response.json()
+
+        trades = []
+
+        if data.get("code") == "00000":
+
+            for pos in data.get("data", []):
+
+                size = float(pos.get("total", 0))
+
+                if size > 0:
+
+                    trades.append({
+
+                        "symbol": pos.get("symbol"),
+                        "side": pos.get("holdSide"),
+                        "entry": pos.get("openPriceAvg"),
+                        "size": size,
+                        "pnl": pos.get("unrealizedPL")
+
+                    })
+
+        return trades
+
+    except Exception as e:
+
+        print("Get open positions error:", e)
+
+        return []
+
 # =========================
 # PRICE
 # =========================
@@ -657,6 +713,11 @@ def status():
         "take_profit": TAKE_PROFIT_PERCENT,
         "stop_loss": STOP_LOSS_PERCENT
     })
+
+@app.route("/get_open_positions")
+def api_get_open_positions():
+
+    return jsonify(get_open_positions())
 
 
 @app.route("/set_capital_percent", methods=["POST"])
