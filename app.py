@@ -372,6 +372,7 @@ def set_stop_loss(symbol, stop_price, side, size):
             "executePrice": str(stop_price),
             "holdSide": side,
             "size": str(size)
+            "triggerType": "mark_price"
         }
 
         body_json = json.dumps(body)
@@ -416,6 +417,7 @@ def set_take_profit(symbol, tp_price, side, size):
             "executePrice": str(tp_price),
             "holdSide": side,
             "size": str(size)
+            "triggerType": "mark_price"
         }
 
         body_json = json.dumps(body)
@@ -735,7 +737,7 @@ def set_stop_loss_percent():
 
 
 @app.route("/set_take_profit", methods=["POST"])
-def set_take_profit():
+def set_take_profit_percent():
     try:
         data = request.json
         value = float(data.get("value"))
@@ -751,10 +753,6 @@ def set_take_profit():
 # ============================
 # HOME ROUTE
 # ============================
-
-@app.route("/")
-def home():
-    return "PerfectBot is running"
 
 
 # ============================
