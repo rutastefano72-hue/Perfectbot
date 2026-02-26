@@ -717,7 +717,24 @@ def status():
 @app.route("/get_open_positions")
 def api_get_open_positions():
 
-    return jsonify(get_open_positions())
+    try:
+
+        positions = get_open_positions()
+
+        if positions is None:
+            return jsonify([])
+
+        if not isinstance(positions, list):
+            return jsonify([])
+
+        return jsonify(positions)
+
+    except Exception as e:
+
+        print("GET OPEN POSITIONS ERROR:", str(e), flush=True)
+        traceback.print_exc()
+
+        return jsonify([])
 
 
 @app.route("/set_capital_percent", methods=["POST"])
