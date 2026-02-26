@@ -281,20 +281,19 @@ def open_position(symbol, side, size, leverage):
 
         size = float(size_format.format(size))
 
-        # calcolo TP / SL
+        # =========================
+        # CALCOLO TP / SL
+        # =========================
+
         if side == "buy":
 
             stop_loss_price = price * (1 - STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 + TAKE_PROFIT_PERCENT / 100)
 
-            hold_side = "long"
-
         else:
 
             stop_loss_price = price * (1 + STOP_LOSS_PERCENT / 100)
             take_profit_price = price * (1 - TAKE_PROFIT_PERCENT / 100)
-
-            hold_side = "short"
 
         stop_loss_price = float(price_format.format(stop_loss_price))
         take_profit_price = float(price_format.format(take_profit_price))
@@ -303,11 +302,14 @@ def open_position(symbol, side, size, leverage):
         print("SL:", stop_loss_price)
         print("TP:", take_profit_price)
 
+        # =========================
+        # ORDER REQUEST
+        # =========================
+
         request_path = "/api/v2/mix/order/place-order"
         timestamp = str(int(time.time() * 1000))
 
         body = {
-
             "symbol": symbol,
             "productType": "USDT-FUTURES",
             "marginMode": "crossed",
@@ -321,12 +323,12 @@ def open_position(symbol, side, size, leverage):
             "orderType": "market",
             "force": "gtc",
 
-            # STOP LOSS integrato
+            # TP / SL INTEGRATI
             "presetStopLossPrice": str(stop_loss_price),
+            "presetTakeProfitPrice": str(take_profit_price),
 
-            # TAKE PROFIT integrato
-            "presetTakeProfitPrice": str(take_profit_price)
-
+            "presetStopLossType": "mark_price",
+            "presetTakeProfitType": "mark_price"
         }
 
         body_json = json.dumps(body)
@@ -339,13 +341,11 @@ def open_position(symbol, side, size, leverage):
         )
 
         headers = {
-
             "ACCESS-KEY": API_KEY,
             "ACCESS-SIGN": signature,
             "ACCESS-TIMESTAMP": timestamp,
             "ACCESS-PASSPHRASE": PASSPHRASE,
             "Content-Type": "application/json"
-
         }
 
         url = BASE_URL + request_path
@@ -358,23 +358,20 @@ def open_position(symbol, side, size, leverage):
 
         print("POSITION RESPONSE:", response.text)
 
-        print("TP SET:", take_profit_price)
-        print("SL SET:", stop_loss_price)
-
         response_data = response.json()
 
         if response_data.get("code") != "00000":
 
             print("POSITION FAILED")
-
             return
 
+        print("TP SET:", take_profit_price)
+        print("SL SET:", stop_loss_price)
         print("TRADE OPENED SUCCESSFULLY WITH TP/SL")
 
     except Exception as e:
 
         print("OPEN POSITION ERROR:", e)
-
         traceback.print_exc()
 
 # =========================
