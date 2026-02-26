@@ -42,6 +42,7 @@ app = Flask(__name__)
 
 bot_running = {"state": False}
 scanner_thread = None
+signal_memory = {}
 
 # =========================
 # DASHBOARD
@@ -418,51 +419,71 @@ def get_signal(symbol):
 def scan_market():
 
     global last_trade_time
+    global signal_memory
 
     try:
 
-        if last_trade_time and time.time()-last_trade_time<60:
-
+        # Evita troppi trade ravvicinati
+        if last_trade_time and time.time() - last_trade_time < 60:
             return
 
-        active=get_open_positions_count()
+        active = get_open_positions_count()
 
-        if active>=MAX_ACTIVE_TRADES:
-
+        if active >= MAX_ACTIVE_TRADES:
             return
 
-        symbols=get_market_symbols()
+        symbols = get_market_symbols()
 
         for symbol in symbols:
 
-            open_symbols=[p["symbol"] for p in get_open_positions()]
+            open_symbols = [p["symbol"] for p in get_open_positions()]
 
             if symbol in open_symbols:
-
                 continue
 
-            signal=get_signal(symbol)
+            signal = get_signal(symbol)
 
+            # Nessun segnale → reset memoria
             if signal is None:
-
+                if symbol in signal_memory:
+                    del signal_memory[symbol]
                 continue
 
-            balance=get_real_balance()
+            # Prima conferma
+            if symbol not in signal_memory:
+                signal_memory[symbol] = signal
+                print(f"{symbol} first confirmation stored", flush=True)
+                continue
 
-            capital=balance*capital_percent["value"]
+            # Seconda conferma
+            if signal_memory.get(symbol) == signal:
+                print(f"{symbol} second confirmation — opening trade", flush=True)
+            else:
+                signal_memory[symbol] = signal
+                continue
 
-            price=get_current_price(symbol)
+            # Apertura trade
+            balance = get_real_balance()
+            capital = balance * capital_percent["value"]
 
-            size=(capital*LEVERAGE)/price
+            price = get_current_price(symbol)
+            if price is None:
+                continue
 
-            open_position(symbol,signal,size,LEVERAGE)
+            size = (capital * LEVERAGE) / price
 
-            last_trade_time=time.time()
+            open_position(symbol, signal, size, LEVERAGE)
+
+            last_trade_time = time.time()
+
+            # Reset memoria dopo apertura
+            if symbol in signal_memory:
+                del signal_memory[symbol]
 
             break
 
-    except:
-
+    except Exception as e:
+        print("SCAN MARKET ERROR:", str(e), flush=True)
         traceback.print_exc()
 
 
