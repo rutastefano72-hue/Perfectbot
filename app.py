@@ -322,10 +322,13 @@ def get_higher_timeframe_trend(symbol):
         response = requests.get(url)
         data = response.json()
 
-        if "data" not in data or data["data"] is None:
+        if not data or "data" not in data:
             return None
 
-        candles = data["data"]
+        candles = data.get("data")
+
+        if not candles or not isinstance(candles, list):
+            return None
 
         if len(candles) < 50:
             return None
@@ -344,7 +347,6 @@ def get_higher_timeframe_trend(symbol):
         return None
 
     except Exception as e:
-
         print("HTF error:", str(e), flush=True)
         return None
 
