@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
 <meta charset="UTF-8">
-<title>PerfectBot Terminal</title>
-
-<style>
-
+<title>PerfectBot Terminal</title><style>
 body{
 margin:0;
 font-family:Arial;
@@ -15,10 +11,10 @@ display:flex;
 }
 
 .sidebar{
-width:180px;
+width:200px;
 background:#020617;
 height:100vh;
-padding:15px;
+padding:20px;
 }
 
 .sidebar h2{
@@ -39,38 +35,37 @@ font-weight:bold;
 
 .start{background:#16a34a;}
 .stop{background:#dc2626;}
-.emergency{background:#f59e0b;}
-.ai{background:#7c3aed;}
-.telegram{background:#229ED9;}
 .refresh{background:#2563eb;}
+.settings{background:#7c3aed;}
 
 .main{
 flex:1;
-padding:20px;
+padding:25px;
 }
 
 .top{
 display:flex;
-gap:15px;
+gap:20px;
 }
 
 .card{
 background:#020617;
-padding:15px;
-border-radius:10px;
+padding:20px;
+border-radius:12px;
 flex:1;
 }
 
 .value{
 font-size:22px;
-margin-top:5px;
+margin-top:8px;
+font-weight:bold;
 }
 
 .section{
-margin-top:20px;
+margin-top:25px;
 background:#020617;
-padding:15px;
-border-radius:10px;
+padding:20px;
+border-radius:12px;
 }
 
 table{
@@ -79,7 +74,7 @@ border-collapse:collapse;
 }
 
 th,td{
-padding:10px;
+padding:12px;
 border-bottom:1px solid #1f2937;
 text-align:left;
 }
@@ -88,93 +83,30 @@ input{
 background:#0b1220;
 border:1px solid #1f2937;
 color:white;
-padding:5px;
-border-radius:5px;
-width:70px;
+padding:6px;
+border-radius:6px;
+width:80px;
+margin-right:8px;
 }
 
-</style>
-
-</head>
-
-<body>
-
-<div class="sidebar">
-
-<h2>PerfectBot</h2>
-
-<button class="start" onclick="startBot()">START BOT</button>
-
+button.small{
+padding:6px 10px;
+font-size:12px;
+border-radius:6px;
+}
+</style></head><body><div class="sidebar"><h2>PerfectBot</h2><button class="start" onclick="startBot()">START BOT</button>
 <button class="stop" onclick="stopBot()">STOP BOT</button>
+<button class="refresh" onclick="loadData()">REFRESH</button>
+<button class="settings" onclick="toggleSettings()">SETTINGS</button>
 
-<button class="emergency">EMERGENCY CLOSE</button>
-
-<button class="ai">AI ON / OFF</button>
-
-<button class="telegram">CONNECT TELEGRAM</button>
-
-<button class="refresh" onclick="loadData()">REFRESH DATA</button>
-
-<button class="ai" onclick="showSettings()">SETTINGS</button>
-  
-<button class="start" onclick="showDashboard()">DASHBOARD</button>
-
-</div>
-
-<div class="main" id="dashboardPanel">
-
-<div class="top">
-
-<div class="card">
+</div><div class="main"><div class="top"><div class="card">
 Balance
-<div id="balance" class="value">$0</div>
-</div>
-
-<div class="card">
-Profit Today
-<div id="profitToday" class="value">$0</div>
-</div>
-
-<div class="card">
-Profit Total
-<div id="profitTotal" class="value">$0</div>
-</div>
-
-<div class="card">
+<div id="balance" class="value">$0.00</div>
+</div><div class="card">
 Status
 <div id="status" class="value">offline</div>
-</div>
-
-</div>
-
-
-<div class="section">
-
-<h3>Trading Controls</h3>
-
-Leverage
-<input id="leverage" value="5">
-
-TP %
-<input id="tp" value="4">
-
-SL %
-<input id="sl" value="2">
-
-Capital %
-<input id="capital">
-
-</div>
-
-
-<div class="section">
-
-<h3>Live Trades</h3>
-
-<table>
-
+</div></div><div class="section"><h3>Live Trades</h3><table>
 <thead>
-
 <tr>
 <th>Symbol</th>
 <th>Side</th>
@@ -182,141 +114,110 @@ Capital %
 <th>PNL</th>
 <th>Action</th>
 </tr>
-
-</thead>
-
-<tbody id="liveTradesTable">
-
+</thead><tbody id="liveTradesTable">
 <tr>
-<td>No trades</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
+<td colspan="5">Loading...</td>
 </tr>
+</tbody></table></div><div class="section" id="settingsPanel" style="display:none;"><h3>Settings</h3>Leverage
+<input id="setLeverage">
+<button class="small" onclick="saveLeverage()">Save</button>
 
-</tbody>
+<br><br>
 
-</table>
+TP %
+<input id="setTP">
+<button class="small" onclick="saveTP()">Save</button>
 
-</div>
+<br><br>
 
+SL %
+<input id="setSL">
+<button class="small" onclick="saveSL()">Save</button>
 
-<div class="section">
+<br><br>
 
-<h3>Trade History</h3>
+Capital %
+<input id="setCapital">
+<button class="small" onclick="saveCapital()">Save</button>
 
-<table>
-
-<thead>
-
-<tr>
-<th>Symbol</th>
-<th>Result</th>
-<th>Profit</th>
-</tr>
-
-</thead>
-
-<tbody id="history">
-
-<tr>
-<td>No history</td>
-<td>-</td>
-<td>-</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-
-<script>
+</div></div><script>
 
 async function loadData(){
 
-    let res = await fetch("/status");
-    let data = await res.json();
+try{
 
-    document.getElementById("balance").innerText = "$" + data.balance;
-    document.getElementById("profitToday").innerText = "$" + data.profit_today;
-    document.getElementById("profitTotal").innerText = "$" + data.profit_total;
-    document.getElementById("status").innerText = data.status;
+// STATUS
+let res = await fetch("/status");
+let data = await res.json();
 
-    if(document.activeElement.id !== "setCapital"){
-        document.getElementById("setCapital").value = Math.round(data.capital_percent * 100);
-    }
+document.getElementById("balance").innerText =
+"$" + parseFloat(data.balance || 0).toFixed(2);
 
-    if(document.activeElement.id !== "setLeverage"){
-        document.getElementById("setLeverage").value = data.leverage;
-    }
+document.getElementById("status").innerText =
+data.status || "offline";
 
-    if(document.activeElement.id !== "setTP"){
-        document.getElementById("setTP").value = data.take_profit;
-    }
+// set values
+document.getElementById("setLeverage").value = data.leverage || 5;
+document.getElementById("setTP").value = data.take_profit || 4;
+document.getElementById("setSL").value = data.stop_loss || 2;
+document.getElementById("setCapital").value =
+Math.round((data.capital_percent || 0.05) * 100);
 
-    if(document.activeElement.id !== "setSL"){
-        document.getElementById("setSL").value = data.stop_loss;
-    }
-
-  // ============================
-// LOAD LIVE POSITIONS
-// ============================
-
+// POSITIONS
 let posRes = await fetch("/get_open_positions");
 let positions = await posRes.json();
 
 let table = document.getElementById("liveTradesTable");
+table.innerHTML="";
 
-if(table){
+if(!positions || positions.length === 0){
 
-    table.innerHTML = "";
+table.innerHTML=`
+<tr>
+<td colspan="5">No open trades</td>
+</tr>
+`;
 
-    positions.forEach(pos => {
+return;
+}
 
-        let pnlValue = parseFloat(pos.pnl);
+positions.forEach(pos=>{
 
-        let pnlColor = pnlValue >= 0 ? "#00ff88" : "#ff4d4d";
+let pnl = parseFloat(pos.pnl || 0);
+let color = pnl >= 0 ? "#00ff88" : "#ff4d4d";
 
-        let pnlText = (pnlValue >= 0 ? "+" : "") + pnlValue.toFixed(4);
+table.innerHTML+=`
+<tr>
+<td>${pos.symbol}</td>
+<td>${pos.side}</td>
+<td>${pos.entry}</td>
+<td style="color:${color}; font-weight:bold;">
+${pnl.toFixed(4)}
+</td>
+<td>
+<button class="small" onclick="closeTrade('${pos.symbol}')">
+Close
+</button>
+</td>
+</tr>
+`;
 
-        table.innerHTML += `
-        <tr>
-            <td>${pos.symbol}</td>
-            <td>${pos.side}</td>
-            <td>${pos.entry}</td>
-            <td style="color:${pnlColor}; font-weight:bold;">
-                ${pnlText}
-            </td>
-            <td>
-                <button onclick="closeTrade('${pos.symbol}')">
-                    Close
-                </button>
-            </td>
-        </tr>
-        `;
+});
 
-    });
-
+}catch(e){
+console.log("LOAD ERROR:",e);
 }
 
 }
 
 async function startBot(){
-
 await fetch("/start",{method:"POST"});
 loadData();
-
 }
 
 async function stopBot(){
-
 await fetch("/stop",{method:"POST"});
 loadData();
-
 }
 
 async function saveLeverage(){
@@ -347,81 +248,33 @@ body:JSON.stringify({value:value})
 }
 
 async function saveCapital(){
+let value=document.getElementById("setCapital").value;
+await fetch("/set_capital_percent",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({percent:parseFloat(value)/100})
+});
+}
 
-    let value = document.getElementById("setCapital").value;
+async function closeTrade(symbol){
 
-    let res = await fetch("/set_capital_percent",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            percent: parseFloat(value) / 100
-        })
-    });
+await fetch("/close_trade",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({symbol:symbol})
+});
 
-    let data = await res.json();
+loadData();
+}
 
-    console.log("SAVE CAPITAL RESPONSE:", data);
-
+function toggleSettings(){
+let panel=document.getElementById("settingsPanel");
+panel.style.display =
+panel.style.display==="none"?"block":"none";
 }
 
 loadData();
 setInterval(loadData,3000);
 
-
-function showSettings(){
-    document.getElementById("settingsPanel").style.display="block";
-    document.getElementById("dashboardPanel").style.display="none";
-}
-
-function showDashboard(){
-    document.getElementById("settingsPanel").style.display="none";
-    document.getElementById("dashboardPanel").style.display="block";
-}
-
-  async function closeTrade(symbol){
-
-    await fetch("/close_trade",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            symbol:symbol
-        })
-    });
-
-    loadData();
-      }
-
-</script>
-
-<div class="main" id="settingsPanel" style="display:none;">
-
-<div class="section">
-<h3>Settings</h3>
-
-Leverage
-<input id="setLeverage" value="5">
-<button onclick="saveLeverage()">Save</button>
-
-TP %
-<input id="setTP" value="4">
-<button onclick="saveTP()">Save</button>
-
-SL %
-<input id="setSL" value="2">
-<button onclick="saveSL()">Save</button>
-
-Capital %
-<input id="setCapital" value="10">
-<button onclick="saveCapital()">Save</button>
-
-</div>
-
-</div>
-
-
-</body>
+</script></body>
 </html>
