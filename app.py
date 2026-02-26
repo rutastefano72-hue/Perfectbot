@@ -720,7 +720,7 @@ def set_leverage():
 
 
 @app.route("/set_stop_loss", methods=["POST"])
-def set_stop_loss():
+def set_stop_loss_percent():
     try:
         data = request.json
         value = float(data.get("value"))
