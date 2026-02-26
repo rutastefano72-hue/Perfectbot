@@ -473,17 +473,23 @@ def stop():
     return jsonify({"success":True})
 
 
-# =========================
+# ============================
 # RUN
-# =========================
+# ============================
 
-if __name__ == "__main__":
+@app.before_first_request
+def start_scanner():
 
-    print("PerfectBot starting...", flush=True)
+    print("STARTING SCANNER...", flush=True)
 
     thread = threading.Thread(target=scanner_loop)
     thread.daemon = True
     thread.start()
+
+
+if __name__ == "__main__":
+
+    print("PerfectBot starting...", flush=True)
 
     port = int(os.environ.get("PORT", 10000))
 
