@@ -278,20 +278,29 @@ if(table){
 
     positions.forEach(pos => {
 
-    table.innerHTML += `
-    <tr>
-        <td>${pos.symbol}</td>
-        <td>${pos.side}</td>
-        <td>${pos.entry}</td>
-        <td>${pos.pnl}</td>
-        <td>
-            <button onclick="closeTrade('${pos.symbol}')">
-                Close
-            </button>
-        </td>
-    </tr>
-    `;
-});
+        let pnlValue = parseFloat(pos.pnl);
+
+        let pnlColor = pnlValue >= 0 ? "#00ff88" : "#ff4d4d";
+
+        let pnlText = (pnlValue >= 0 ? "+" : "") + pnlValue.toFixed(4);
+
+        table.innerHTML += `
+        <tr>
+            <td>${pos.symbol}</td>
+            <td>${pos.side}</td>
+            <td>${pos.entry}</td>
+            <td style="color:${pnlColor}; font-weight:bold;">
+                ${pnlText}
+            </td>
+            <td>
+                <button onclick="closeTrade('${pos.symbol}')">
+                    Close
+                </button>
+            </td>
+        </tr>
+        `;
+
+    });
 
 }
 
