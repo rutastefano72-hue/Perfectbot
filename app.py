@@ -358,6 +358,9 @@ def open_position(symbol, side, size, leverage):
 
         print("POSITION RESPONSE:", response.text)
 
+        print("TP SET:", take_profit_price)
+        print("SL SET:", stop_loss_price)
+
         response_data = response.json()
 
         if response_data.get("code") != "00000":
