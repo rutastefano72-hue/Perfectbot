@@ -224,6 +224,11 @@ def get_symbol_precision(symbol):
 
 def open_position(symbol, side, size, leverage):
 
+    # 🔒 BLOCCO DI SICUREZZA ASSOLUTO
+    if not bot_running["state"]:
+        print("BLOCKED: bot is OFF — position NOT opened", flush=True)
+        return
+
     try:
 
         price = get_current_price(symbol)
