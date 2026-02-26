@@ -478,90 +478,101 @@ def scan_market():
 
     global last_trade_time
 
-    symbols = get_market_symbols()
+    try:
 
-    print("Scanning symbols:", len(symbols))
+        symbols = get_market_symbols()
 
-    trade_opened = False
+        print("Scanning symbols:", len(symbols), flush=True)
 
-    # protezione: attendi almeno 60 secondi tra un trade e l'altro
-    current_time = time.time()
+        trade_opened = False
 
-    if last_trade_time is not None:
-        elapsed = current_time - last_trade_time
-        if elapsed < 60:
-            print("Waiting cooldown:", int(60 - elapsed), "seconds remaining")
+        # protezione: attendi almeno 60 secondi tra un trade e l'altro
+        current_time = time.time()
+
+        if last_trade_time is not None:
+            elapsed = current_time - last_trade_time
+            if elapsed < 60:
+                print("Waiting cooldown:", int(60 - elapsed), "seconds remaining", flush=True)
+                return
+
+        # ottieni numero posizioni reali aperte
+        active_trades_count = get_open_positions_count()
+
+        print("REAL ACTIVE POSITIONS:", active_trades_count, flush=True)
+
+        if active_trades_count >= MAX_ACTIVE_TRADES:
+            print("MAX ACTIVE TRADES REACHED", flush=True)
             return
 
-    for symbol in symbols:
 
-        active_trades = get_open_positions_count()
+        for symbol in symbols:
 
-        print("REAL ACTIVE POSITIONS:", active_trades["count"])
+            if trade_opened:
+                print("Trade already opened this scan", flush=True)
+                return
 
-        if active_trades["count"] >= MAX_ACTIVE_TRADES:
-            print("MAX ACTIVE TRADES REACHED")
+            signal = get_signal(symbol)
+
+            if signal is None:
+                continue
+
+            print("SIGNAL FOUND:", symbol, signal, flush=True)
+
+            price = get_current_price(symbol)
+
+            if price is None:
+                continue
+
+            balance = get_real_balance()
+
+            if balance is None or balance <= 0:
+                print("Invalid balance:", balance, flush=True)
+                return
+
+            capital_to_use = balance * capital_percent["value"]
+
+            position_size = (capital_to_use * LEVERAGE) / price
+
+            min_size = 0.01
+
+            if position_size < min_size:
+                print("Size too small, skipping:", symbol, flush=True)
+                continue
+
+            side = signal
+
+            print("======= POSITION SIZE CALCULATION =======", flush=True)
+            print("Symbol:", symbol, flush=True)
+            print("Balance:", balance, flush=True)
+            print("Capital %:", capital_percent["value"], flush=True)
+            print("Capital used:", capital_to_use, flush=True)
+            print("Leverage:", LEVERAGE, flush=True)
+            print("Price:", price, flush=True)
+            print("Position size:", position_size, flush=True)
+            print("Side:", side, flush=True)
+            print("========================================", flush=True)
+
+            open_position(
+                symbol,
+                side,
+                round(position_size, 3),
+                LEVERAGE
+            )
+
+            print("TRADE OPENED:", symbol, side, flush=True)
+
+            trade_opened = True
+
+            last_trade_time = time.time()
+
             return
 
-        if trade_opened:
-            print("Trade already opened this scan")
-            return
+        print("No valid signals found", flush=True)
 
-        signal = get_signal(symbol)
+    except Exception as e:
 
-        if signal is None:
-            continue
-
-        price = get_current_price(symbol)
-
-        if price is None:
-            continue
-
-        balance = get_real_balance()
-
-        if balance is None or balance <= 0:
-            print("Invalid balance:", balance)
-            return
-
-        capital_to_use = balance * capital_percent["value"]
-
-        position_size = (capital_to_use * LEVERAGE) / price
-
-        min_size = 0.01
-
-        if position_size < min_size:
-            print("Size too small, skipping:", symbol)
-            continue
-
-        side = signal
-
-        print("======= POSITION SIZE CALCULATION =======")
-        print("Symbol:", symbol)
-        print("Balance:", balance)
-        print("Capital %:", capital_percent["value"])
-        print("Capital used:", capital_to_use)
-        print("Leverage:", LEVERAGE)
-        print("Price:", price)
-        print("Position size:", position_size)
-        print("Side:", side)
-        print("========================================")
-
-        open_position(
-            symbol,
-            side,
-            round(position_size, 3),
-            LEVERAGE
-        )
-
-        active_trades["count"] += 1
-
-        print("TRADE OPENED:", symbol, side)
-
-        trade_opened = True
-
-        last_trade_time = time.time()
-
-        return
+        print("SCANNER ERROR:", str(e), flush=True)
+        traceback.print_exc()
 
 # =========================
 # SCANNER LOOP
