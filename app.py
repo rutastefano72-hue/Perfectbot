@@ -477,19 +477,17 @@ def stop():
 # RUN
 # ============================
 
-@app.before_first_request
-def start_scanner():
-
-    print("STARTING SCANNER...", flush=True)
-
-    thread = threading.Thread(target=scanner_loop)
-    thread.daemon = True
-    thread.start()
-
 
 if __name__ == "__main__":
 
     print("PerfectBot starting...", flush=True)
+
+    # START SCANNER THREAD
+    thread = threading.Thread(target=scanner_loop)
+    thread.daemon = True
+    thread.start()
+
+    print("Scanner thread started", flush=True)
 
     port = int(os.environ.get("PORT", 10000))
 
