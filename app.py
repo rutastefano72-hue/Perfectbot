@@ -6,6 +6,7 @@ import hashlib
 import requests
 import json
 import threading
+import traceback
 
 import pandas as pd
 import numpy as np
