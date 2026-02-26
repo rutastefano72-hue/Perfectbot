@@ -468,6 +468,57 @@ def scan_market():
                 print("Trade already opened this scan", flush=True)
                 return
 
+
+            # =========================
+            # AGGIUNTA: controllo se simbolo già aperto
+            # =========================
+
+            timestamp = str(int(time.time() * 1000))
+
+            request_path = "/api/v2/mix/position/all-position?productType=USDT-FUTURES"
+
+            signature = generate_signature(
+                timestamp,
+                "GET",
+                request_path
+            )
+
+            headers = {
+                "ACCESS-KEY": API_KEY,
+                "ACCESS-SIGN": signature,
+                "ACCESS-TIMESTAMP": timestamp,
+                "ACCESS-PASSPHRASE": PASSPHRASE,
+                "Content-Type": "application/json"
+            }
+
+            url = BASE_URL + request_path
+
+            response = requests.get(url, headers=headers)
+
+            data = response.json()
+
+            already_open = False
+
+            if data.get("code") == "00000":
+
+                for pos in data.get("data", []):
+
+                    if pos.get("symbol") == symbol and float(pos.get("total", 0)) > 0:
+
+                        already_open = True
+                        break
+
+            if already_open:
+
+                print(symbol, "already has open position, skipping", flush=True)
+                continue
+
+
+            # =========================
+            # FINE AGGIUNTA
+            # =========================
+
+
             signal = get_signal(symbol)
 
             if signal is None:
