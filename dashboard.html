@@ -175,11 +175,13 @@ Capital %
 
 <thead>
 
+<thead>
 <tr>
 <th>Symbol</th>
 <th>Side</th>
 <th>Entry</th>
 <th>PNL</th>
+<th>Action</th>
 </tr>
 
 </thead>
@@ -276,16 +278,20 @@ if(table){
 
     positions.forEach(pos => {
 
-        table.innerHTML += `
-        <tr>
-            <td>${pos.symbol}</td>
-            <td>${pos.side}</td>
-            <td>${pos.entry}</td>
-            <td>${pos.pnl}</td>
-        </tr>
-        `;
-
-    });
+    table.innerHTML += `
+    <tr>
+        <td>${pos.symbol}</td>
+        <td>${pos.side}</td>
+        <td>${pos.entry}</td>
+        <td>${pos.pnl}</td>
+        <td>
+            <button onclick="closeTrade('${pos.symbol}')">
+                Close
+            </button>
+        </td>
+    </tr>
+    `;
+});
 
 }
 
@@ -365,6 +371,21 @@ function showDashboard(){
     document.getElementById("settingsPanel").style.display="none";
     document.getElementById("dashboardPanel").style.display="block";
 }
+
+  async function closeTrade(symbol){
+
+    await fetch("/close_trade",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            symbol:symbol
+        })
+    });
+
+    loadData();
+      }
 
 </script>
 
