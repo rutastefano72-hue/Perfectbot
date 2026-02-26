@@ -415,13 +415,37 @@ def get_market_symbols():
 
 def scanner_loop():
 
+    print("SCANNER STARTED", flush=True)
+
     while True:
 
-        if bot_running["state"]:
+        try:
 
-            scan_market()
+            print("BOT STATE:", bot_running["state"], flush=True)
 
-        time.sleep(10)
+            if bot_running["state"] == True:
+
+                print("SCANNING MARKET NOW...", flush=True)
+
+                scan_market()
+
+                print("SCAN COMPLETE — waiting 60 seconds", flush=True)
+
+                time.sleep(60)
+
+            else:
+
+                print("BOT OFF — waiting 5 seconds", flush=True)
+
+                time.sleep(5)
+
+        except Exception as e:
+
+            print("SCANNER LOOP ERROR:", str(e), flush=True)
+
+            traceback.print_exc()
+
+            time.sleep(10)
 
 
 threading.Thread(target=scanner_loop,daemon=True).start()
