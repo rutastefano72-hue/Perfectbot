@@ -224,6 +224,51 @@ def get_symbol_precision(symbol):
 # OPEN POSITION REAL
 # =========================
 
+def set_leverage(symbol):
+
+    try:
+
+        request_path = "/api/v2/mix/account/set-leverage"
+        timestamp = str(int(time.time()*1000))
+
+        body = {
+            "symbol": symbol,
+            "productType": "USDT-FUTURES",
+            "marginCoin": "USDT",
+            "leverage": str(LEVERAGE),
+            "holdSide": "long"
+        }
+
+        body_json = json.dumps(body)
+
+        signature = generate_signature(timestamp, "POST", request_path, body_json)
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
+        }
+
+        url = BASE_URL + request_path
+        response = requests.post(url, headers=headers, data=body_json)
+
+        print("SET LEVERAGE LONG:", response.text, flush=True)
+
+        # 🔁 Imposta anche per SHORT
+        body["holdSide"] = "short"
+        body_json = json.dumps(body)
+
+        signature = generate_signature(timestamp, "POST", request_path, body_json)
+
+        response = requests.post(url, headers=headers, data=body_json)
+
+        print("SET LEVERAGE SHORT:", response.text, flush=True)
+
+    except Exception as e:
+        print("Leverage error:", str(e), flush=True)
+
 def open_position(symbol, side, size, leverage):
 
     # 🔒 BLOCCO DI SICUREZZA ASSOLUTO
@@ -237,6 +282,8 @@ def open_position(symbol, side, size, leverage):
 
         if price is None:
             return
+
+        set_leverage(symbol)
 
         price_precision, size_precision = get_symbol_precision(symbol)
 
