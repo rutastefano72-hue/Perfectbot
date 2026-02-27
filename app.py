@@ -424,7 +424,6 @@ def get_signal(symbol):
             return None
 
         candles = data["data"]
-
         closes = np.array([float(c[4]) for c in candles])
 
         ema50 = pd.Series(closes).ewm(span=50).mean()
@@ -476,7 +475,6 @@ def get_signal(symbol):
         # =============================
 
         regime = detect_market_regime(symbol)
-
         print(f"{symbol} REGIME: {regime}", flush=True)
 
         if regime == "NO_TRADE":
@@ -486,20 +484,29 @@ def get_signal(symbol):
             return None
 
         # =============================
-        # HTF FILTER
+        # HTF FILTER (now informational)
         # =============================
 
         htf_trend = get_higher_timeframe_trend(symbol)
+        print(f"{symbol} HTF: {htf_trend}", flush=True)
 
-        if regime == "TREND_UP" and score_buy >= 3 and htf_trend == "buy":
-            print(f"{symbol} SIGNAL: BUY CONFIRMED (AI TREND UP)", flush=True)
+        # BUY
+        if regime == "TREND_UP" and score_buy >= 3:
+            if htf_trend == "buy":
+                print(f"{symbol} STRONG BUY (HTF aligned)", flush=True)
+            else:
+                print(f"{symbol} BUY without HTF alignment", flush=True)
             return "buy"
 
-        if regime == "TREND_DOWN" and score_sell >= 3 and htf_trend == "sell":
-            print(f"{symbol} SIGNAL: SELL CONFIRMED (AI TREND DOWN)", flush=True)
+        # SELL
+        if regime == "TREND_DOWN" and score_sell >= 3:
+            if htf_trend == "sell":
+                print(f"{symbol} STRONG SELL (HTF aligned)", flush=True)
+            else:
+                print(f"{symbol} SELL without HTF alignment", flush=True)
             return "sell"
 
-        print(f"{symbol} rejected by AI regime or HTF filter", flush=True)
+        print(f"{symbol} rejected by AI regime or score", flush=True)
 
         return None
 
