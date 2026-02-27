@@ -28,7 +28,7 @@ capital_percent = {"value": 0.05}
 last_trade_time = None
 
 STOP_LOSS_PERCENT = 2.0
-TAKE_PROFIT_PERCENT = 4.0
+TAKE_PROFIT_PERCENT = 3.0
 
 MAX_ACTIVE_TRADES = 5
 
