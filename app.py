@@ -518,12 +518,24 @@ def get_signal(symbol):
         response = requests.get(url)
         data = response.json()
 
-        if "data" not in data:
+        # ===== PROTEZIONE API =====
+        if "data" not in data or not data["data"]:
+            print(f"{symbol} - No candle data", flush=True)
             return None
 
         candles = data["data"]
-        closes = np.array([float(c[4]) for c in candles])
 
+        if candles is None or len(candles) < 50:
+            print(f"{symbol} - Invalid candle set", flush=True)
+            return None
+
+        closes = np.array([float(c[4]) for c in candles if c and len(c) > 4])
+
+        if len(closes) < 50:
+            print(f"{symbol} - Not enough close prices", flush=True)
+            return None
+
+        # ===== EMA =====
         ema50 = pd.Series(closes).ewm(span=50).mean()
         ema200 = pd.Series(closes).ewm(span=200).mean()
 
