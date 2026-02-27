@@ -229,42 +229,37 @@ def set_leverage(symbol):
     try:
 
         request_path = "/api/v2/mix/account/set-leverage"
-        timestamp = str(int(time.time()*1000))
 
-        body = {
-            "symbol": symbol,
-            "productType": "USDT-FUTURES",
-            "marginCoin": "USDT",
-            "leverage": str(LEVERAGE),
-            "holdSide": "long"
-        }
+        for side in ["long", "short"]:
 
-        body_json = json.dumps(body)
+            timestamp = str(int(time.time()*1000))
 
-        signature = generate_signature(timestamp, "POST", request_path, body_json)
+            body = {
+                "symbol": symbol,
+                "productType": "USDT-FUTURES",
+                "marginCoin": "USDT",
+                "leverage": str(LEVERAGE),
+                "holdSide": side
+            }
 
-        headers = {
-            "ACCESS-KEY": API_KEY,
-            "ACCESS-SIGN": signature,
-            "ACCESS-TIMESTAMP": timestamp,
-            "ACCESS-PASSPHRASE": PASSPHRASE,
-            "Content-Type": "application/json"
-        }
+            body_json = json.dumps(body)
 
-        url = BASE_URL + request_path
-        response = requests.post(url, headers=headers, data=body_json)
+            signature = generate_signature(timestamp, "POST", request_path, body_json)
 
-        print("SET LEVERAGE LONG:", response.text, flush=True)
+            headers = {
+                "ACCESS-KEY": API_KEY,
+                "ACCESS-SIGN": signature,
+                "ACCESS-TIMESTAMP": timestamp,
+                "ACCESS-PASSPHRASE": PASSPHRASE,
+                "Content-Type": "application/json"
+            }
 
-        # 🔁 Imposta anche per SHORT
-        body["holdSide"] = "short"
-        body_json = json.dumps(body)
+            url = BASE_URL + request_path
+            response = requests.post(url, headers=headers, data=body_json)
 
-        signature = generate_signature(timestamp, "POST", request_path, body_json)
+            print(f"SET LEVERAGE {side.upper()}:", response.text, flush=True)
 
-        response = requests.post(url, headers=headers, data=body_json)
-
-        print("SET LEVERAGE SHORT:", response.text, flush=True)
+            time.sleep(0.2)
 
     except Exception as e:
         print("Leverage error:", str(e), flush=True)
