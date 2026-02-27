@@ -120,7 +120,7 @@ def get_open_positions():
 
         request_path = "/api/v2/mix/position/all-position?productType=USDT-FUTURES"
 
-        signature = generate_signature(timestamp,"GET",request_path)
+        signature = generate_signature(timestamp, "GET", request_path)
 
         headers = {
             "ACCESS-KEY": API_KEY,
@@ -145,12 +145,28 @@ def get_open_positions():
 
                 if size > 0:
 
+                    symbol = pos.get("symbol")
+                    side = pos.get("holdSide")
+                    entry_price = float(pos.get("openPriceAvg", 0))
+                    unrealized = float(pos.get("unrealizedPL", 0))
+
+                    # Calcolo notional attuale
+                    mark_price = float(pos.get("markPrice", 0))
+                    notional = size * mark_price
+
+                    # Fee round trip stimata (0.06% entrata + 0.06% uscita)
+                    estimated_fees = notional * 0.0012
+
+                    # PNL netto reale stimato
+                    net_pnl = unrealized - estimated_fees
+
                     trades.append({
 
-                        "symbol": pos.get("symbol"),
-                        "side": pos.get("holdSide"),
-                        "entry": pos.get("openPriceAvg"),
-                        "pnl": pos.get("unrealizedPL")
+                        "symbol": symbol,
+                        "side": side,
+                        "entry": entry_price,
+                        "pnl": unrealized,
+                        "net_pnl": net_pnl
 
                     })
 
