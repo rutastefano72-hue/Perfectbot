@@ -205,23 +205,31 @@ async function loadData(){
     table.innerHTML = "";
 
     if(positions.length === 0){
-        table.innerHTML = "<tr><td colspan='4'>No trades</td></tr>";
+        table.innerHTML = "<tr><td colspan='5'>No trades</td></tr>";
         return;
     }
 
     positions.forEach(pos => {
 
         let pnl = parseFloat(pos.pnl);
-        let color = pnl >= 0 ? "#00ff88" : "#ff4d4d";
-        let glow = pnl >= 0 ? "0 0 8px #00ff88" : "0 0 8px #ff4d4d";
+        let net = parseFloat(pos.net_pnl);
+
+        let pnlColor = pnl >= 0 ? "#00ff88" : "#ff4d4d";
+        let pnlGlow = pnl >= 0 ? "0 0 8px #00ff88" : "0 0 8px #ff4d4d";
+
+        let netColor = net >= 0 ? "#00d4ff" : "#ff9900";
+        let netGlow = net >= 0 ? "0 0 8px #00d4ff" : "0 0 8px #ff9900";
 
         table.innerHTML += `
         <tr>
             <td>${pos.symbol}</td>
             <td>${pos.side}</td>
             <td>${pos.entry}</td>
-            <td style="color:${color}; text-shadow:${glow}; font-weight:bold;">
+            <td style="color:${pnlColor}; text-shadow:${pnlGlow}; font-weight:bold;">
                 ${pnl.toFixed(4)}
+            </td>
+            <td style="color:${netColor}; text-shadow:${netGlow}; font-weight:bold;">
+                ${net.toFixed(4)}
             </td>
         </tr>
         `;
