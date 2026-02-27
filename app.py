@@ -331,6 +331,7 @@ def place_conditional_order(symbol, side, size, trigger_price):
 
         "symbol": symbol,
         "productType": "USDT-FUTURES",
+        "marginMode": "crossed",
         "marginCoin": "USDT",
         "planType": "normal_plan",
         "triggerPrice": str(trigger_price),
