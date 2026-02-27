@@ -245,68 +245,122 @@ def open_position(symbol, side, size, leverage):
         if side == "buy":
 
             stop_loss_price = round(price * (1 - STOP_LOSS_PERCENT/100), price_precision)
-
             take_profit_price = round(price * (1 + TAKE_PROFIT_PERCENT/100), price_precision)
+
+            close_side = "sell"
 
         else:
 
             stop_loss_price = round(price * (1 + STOP_LOSS_PERCENT/100), price_precision)
-
             take_profit_price = round(price * (1 - TAKE_PROFIT_PERCENT/100), price_precision)
 
-        request_path="/api/v2/mix/order/place-order"
+            close_side = "buy"
 
-        timestamp=str(int(time.time()*1000))
+        request_path = "/api/v2/mix/order/place-order"
 
-        body={
+        timestamp = str(int(time.time()*1000))
 
-            "symbol":symbol,
-            "productType":"USDT-FUTURES",
-            "marginMode":"crossed",
-            "marginCoin":"USDT",
+        body = {
 
-            "size":str(size),
+            "symbol": symbol,
+            "productType": "USDT-FUTURES",
+            "marginMode": "crossed",
+            "marginCoin": "USDT",
 
-            "side":side,
-
-            "tradeSide":"open",
-
-            "orderType":"market",
-
-            "presetStopLossPrice":str(stop_loss_price),
-            "presetTakeProfitPrice":str(take_profit_price),
-
-            "presetStopLossType":"mark_price",
-            "presetTakeProfitType":"mark_price"
-        }
-
-        body_json=json.dumps(body)
-
-        signature=generate_signature(timestamp,"POST",request_path,body_json)
-
-        headers={
-
-            "ACCESS-KEY":API_KEY,
-            "ACCESS-SIGN":signature,
-            "ACCESS-TIMESTAMP":timestamp,
-            "ACCESS-PASSPHRASE":PASSPHRASE,
-            "Content-Type":"application/json"
+            "size": str(size),
+            "side": side,
+            "tradeSide": "open",
+            "orderType": "market"
 
         }
 
-        url=BASE_URL+request_path
+        body_json = json.dumps(body)
 
-        response=requests.post(url,headers=headers,data=body_json)
+        signature = generate_signature(timestamp, "POST", request_path, body_json)
 
-        print("POSITION RESPONSE:",response.text)
+        headers = {
 
-        print("TP SET:",take_profit_price)
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+            "Content-Type": "application/json"
 
-        print("SL SET:",stop_loss_price)
+        }
+
+        url = BASE_URL + request_path
+
+        response = requests.post(url, headers=headers, data=body_json)
+
+        print("POSITION RESPONSE:", response.text)
+
+        result = response.json()
+
+        if result.get("code") != "00000":
+            print("Order failed — TP/SL not sent", flush=True)
+            return
+
+        # ⏳ piccolo delay per sicurezza exchange
+        time.sleep(1)
+
+        # ==============================
+        # TAKE PROFIT ORDER (CONDIZIONALE)
+        # ==============================
+
+        place_conditional_order(symbol, close_side, size, take_profit_price)
+
+        # ==============================
+        # STOP LOSS ORDER (CONDIZIONALE)
+        # ==============================
+
+        place_conditional_order(symbol, close_side, size, stop_loss_price)
+
+        print("TP ORDER SENT:", take_profit_price, flush=True)
+        print("SL ORDER SENT:", stop_loss_price, flush=True)
 
     except Exception as e:
 
         traceback.print_exc()
+
+def place_conditional_order(symbol, side, size, trigger_price):
+
+    request_path = "/api/v2/mix/order/place-plan-order"
+    timestamp = str(int(time.time()*1000))
+
+    body = {
+
+        "symbol": symbol,
+        "productType": "USDT-FUTURES",
+        "marginCoin": "USDT",
+        "planType": "normal_plan",
+        "triggerPrice": str(trigger_price),
+        "triggerType": "mark_price",
+        "side": side,
+        "orderType": "market",
+        "size": str(size),
+        "clientOid": str(int(time.time()*1000))
+
+    }
+
+    body_json = json.dumps(body)
+
+    signature = generate_signature(timestamp, "POST", request_path, body_json)
+
+    headers = {
+
+        "ACCESS-KEY": API_KEY,
+        "ACCESS-SIGN": signature,
+        "ACCESS-TIMESTAMP": timestamp,
+        "ACCESS-PASSPHRASE": PASSPHRASE,
+        "Content-Type": "application/json"
+
+    }
+
+    url = BASE_URL + request_path
+
+    response = requests.post(url, headers=headers, data=body_json)
+
+    print("CONDITIONAL ORDER RESPONSE:", response.text, flush=True)
 
 
 # =========================
