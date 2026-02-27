@@ -337,6 +337,7 @@ def place_conditional_order(symbol, side, size, trigger_price):
         "triggerPrice": str(trigger_price),
         "triggerType": "mark_price",
         "side": side,
+        "tradeSide": "close",
         "orderType": "market",
         "size": str(size),
         "clientOid": str(int(time.time()*1000))
