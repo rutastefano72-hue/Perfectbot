@@ -529,24 +529,11 @@ def get_signal(symbol):
 
         price = closes[-1]
 
-        score_buy = 0
-        score_sell = 0
+        # ==== TREND STRUCTURE FLAGS ====
+        trend_up_structure = ema50.iloc[-1] > ema200.iloc[-1] and price > ema50.iloc[-1]
+        trend_down_structure = ema50.iloc[-1] < ema200.iloc[-1] and price < ema50.iloc[-1]
 
-        # EMA Trend
-        if ema50.iloc[-1] > ema200.iloc[-1]:
-            score_buy += 1
-
-        if ema50.iloc[-1] < ema200.iloc[-1]:
-            score_sell += 1
-
-        # Price vs EMA50
-        if price > ema50.iloc[-1]:
-            score_buy += 1
-
-        if price < ema50.iloc[-1]:
-            score_sell += 1
-
-        # RSI
+        # ==== RSI (BONUS CONFIRMATION) ====
         delta = np.diff(closes)
         gain = np.where(delta > 0, delta, 0)
         loss = np.where(delta < 0, -delta, 0)
@@ -560,13 +547,7 @@ def get_signal(symbol):
             rs = avg_gain / avg_loss
             rsi = 100 - (100 / (1 + rs))
 
-        if rsi > 55:
-            score_buy += 1
-
-        if rsi < 45:
-            score_sell += 1
-
-        print(f"{symbol} SCORE BUY: {score_buy} | SCORE SELL: {score_sell}", flush=True)
+        print(f"{symbol} RSI: {rsi}", flush=True)
 
         # =============================
         # REGIME AI LAYER
@@ -582,35 +563,33 @@ def get_signal(symbol):
             return None
 
         # =============================
-        # HTF FILTER (SMART MODE)
+        # HTF (BONUS)
         # =============================
 
         htf_trend = get_higher_timeframe_trend(symbol)
         print(f"{symbol} HTF: {htf_trend}", flush=True)
 
         # ===== BUY LOGIC =====
-        if regime == "TREND_UP":
+        if regime == "TREND_UP" and trend_up_structure:
 
-            if htf_trend == "buy" and score_buy >= 3:
-                print(f"{symbol} BUY CONFIRMED (HTF aligned)", flush=True)
+            if htf_trend == "buy":
+                print(f"{symbol} STRONG BUY (HTF aligned)", flush=True)
                 return "buy"
 
-            if htf_trend != "buy" and score_buy >= 4:
-                print(f"{symbol} BUY CONFIRMED (strong signal without HTF)", flush=True)
-                return "buy"
+            print(f"{symbol} BUY (structure confirmed)", flush=True)
+            return "buy"
 
         # ===== SELL LOGIC =====
-        if regime == "TREND_DOWN":
+        if regime == "TREND_DOWN" and trend_down_structure:
 
-            if htf_trend == "sell" and score_sell >= 3:
-                print(f"{symbol} SELL CONFIRMED (HTF aligned)", flush=True)
+            if htf_trend == "sell":
+                print(f"{symbol} STRONG SELL (HTF aligned)", flush=True)
                 return "sell"
 
-            if htf_trend != "sell" and score_sell >= 4:
-                print(f"{symbol} SELL CONFIRMED (strong signal without HTF)", flush=True)
-                return "sell"
+            print(f"{symbol} SELL (structure confirmed)", flush=True)
+            return "sell"
 
-        print(f"{symbol} rejected by smart HTF logic", flush=True)
+        print(f"{symbol} rejected by structure logic", flush=True)
 
         return None
 
