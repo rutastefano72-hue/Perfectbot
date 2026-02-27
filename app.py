@@ -552,14 +552,14 @@ def get_signal(symbol):
             return None
 
         # ===== EMA =====
-        ema50 = pd.Series(closes).ewm(span=50).mean()
-        ema200 = pd.Series(closes).ewm(span=200).mean()
+        ema50_series = pd.Series(closes).ewm(span=50).mean()
+        ema200_series = pd.Series(closes).ewm(span=200).mean()
+
+        ema50 = ema50_series.iloc[-1]
+        ema200 = ema200_series.iloc[-1]
 
         price = closes[-1]
-
-        # ==== TREND STRUCTURE FLAGS ====
-        trend_up_structure = ema50.iloc[-1] > ema200.iloc[-1] and price > ema50.iloc[-1]
-        trend_down_structure = ema50.iloc[-1] < ema200.iloc[-1] and price < ema50.iloc[-1]
+        previous_price = closes[-2]
 
         # ==== RSI (BONUS CONFIRMATION) ====
         delta = np.diff(closes)
@@ -584,10 +584,7 @@ def get_signal(symbol):
         regime = detect_market_regime(symbol)
         print(f"{symbol} REGIME: {regime}", flush=True)
 
-        if regime == "NO_TRADE":
-            return None
-
-        if regime == "RANGE":
+        if regime == "NO_TRADE" or regime == "RANGE":
             return None
 
         # =============================
@@ -597,27 +594,37 @@ def get_signal(symbol):
         htf_trend = get_higher_timeframe_trend(symbol)
         print(f"{symbol} HTF: {htf_trend}", flush=True)
 
-        # ===== BUY LOGIC =====
-        if regime == "TREND_UP" and trend_up_structure:
+        # =====================================================
+        # ===== PULLBACK ENTRY LOGIC =====
+        # =====================================================
 
-            if htf_trend == "buy":
-                print(f"{symbol} STRONG BUY (HTF aligned)", flush=True)
+        # ---- LONG PULLBACK ----
+        if regime == "TREND_UP" and ema50 > ema200:
+
+            # prezzo era sotto o vicino EMA50 e ora chiude sopra
+            if previous_price <= ema50 and price > ema50:
+
+                if htf_trend == "buy":
+                    print(f"{symbol} PULLBACK LONG (HTF aligned)", flush=True)
+                else:
+                    print(f"{symbol} PULLBACK LONG", flush=True)
+
                 return "buy"
 
-            print(f"{symbol} BUY (structure confirmed)", flush=True)
-            return "buy"
+        # ---- SHORT PULLBACK ----
+        if regime == "TREND_DOWN" and ema50 < ema200:
 
-        # ===== SELL LOGIC =====
-        if regime == "TREND_DOWN" and trend_down_structure:
+            # prezzo era sopra o vicino EMA50 e ora chiude sotto
+            if previous_price >= ema50 and price < ema50:
 
-            if htf_trend == "sell":
-                print(f"{symbol} STRONG SELL (HTF aligned)", flush=True)
+                if htf_trend == "sell":
+                    print(f"{symbol} PULLBACK SHORT (HTF aligned)", flush=True)
+                else:
+                    print(f"{symbol} PULLBACK SHORT", flush=True)
+
                 return "sell"
 
-            print(f"{symbol} SELL (structure confirmed)", flush=True)
-            return "sell"
-
-        print(f"{symbol} rejected by structure logic", flush=True)
+        print(f"{symbol} rejected by pullback logic", flush=True)
 
         return None
 
@@ -626,7 +633,6 @@ def get_signal(symbol):
         print("Signal error:", str(e), flush=True)
         traceback.print_exc()
         return None
-
 
 # =========================
 # SCAN MARKET
