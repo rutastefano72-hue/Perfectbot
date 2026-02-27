@@ -582,29 +582,23 @@ def get_signal(symbol):
             return None
 
         # =============================
-        # HTF FILTER (now informational)
+        # HTF FILTER (NOW OBBLIGATORIO)
         # =============================
 
         htf_trend = get_higher_timeframe_trend(symbol)
         print(f"{symbol} HTF: {htf_trend}", flush=True)
 
-        # BUY
-        if regime == "TREND_UP" and score_buy >= 3:
-            if htf_trend == "buy":
-                print(f"{symbol} STRONG BUY (HTF aligned)", flush=True)
-            else:
-                print(f"{symbol} BUY without HTF alignment", flush=True)
+        # BUY — HTF MUST ALIGN
+        if regime == "TREND_UP" and score_buy >= 3 and htf_trend == "buy":
+            print(f"{symbol} BUY CONFIRMED (HTF aligned)", flush=True)
             return "buy"
 
-        # SELL
-        if regime == "TREND_DOWN" and score_sell >= 3:
-            if htf_trend == "sell":
-                print(f"{symbol} STRONG SELL (HTF aligned)", flush=True)
-            else:
-                print(f"{symbol} SELL without HTF alignment", flush=True)
+        # SELL — HTF MUST ALIGN
+        if regime == "TREND_DOWN" and score_sell >= 3 and htf_trend == "sell":
+            print(f"{symbol} SELL CONFIRMED (HTF aligned)", flush=True)
             return "sell"
 
-        print(f"{symbol} rejected by AI regime or score", flush=True)
+        print(f"{symbol} rejected by HTF alignment or insufficient score", flush=True)
 
         return None
 
