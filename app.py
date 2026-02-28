@@ -811,9 +811,12 @@ def api_positions():
 @app.route("/trade_history")
 def trade_history():
     try:
-        timestamp = str(int(time.time() * 1000))
+        now = int(time.time() * 1000)
+        seven_days_ago = now - (7 * 24 * 60 * 60 * 1000)
 
-        request_path = "/api/v2/mix/order/fill-history?productType=umcbl&pageSize=50&pageNo=1"
+        timestamp = str(now)
+
+        request_path = f"/api/v2/mix/order/fill-history?productType=umcbl&startTime={seven_days_ago}&endTime={now}&pageSize=50&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
