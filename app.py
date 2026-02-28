@@ -812,7 +812,9 @@ def api_positions():
 def trade_history():
     try:
         timestamp = str(int(time.time() * 1000))
-        request_path = "/api/v2/mix/order/history?productType=usdt-futures&pageSize=5&pageNo=1"
+
+        # 🔥 endpoint corretto V2
+        request_path = "/api/v2/mix/order/orders-history?productType=usdt-futures&pageSize=5&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
@@ -826,7 +828,8 @@ def trade_history():
         url = BASE_URL + request_path
         response = requests.get(url, headers=headers, timeout=10)
 
-        return response.text  # 👈 stampiamo tutto grezzo
+        # 👇 restituiamo la risposta grezza di Bitget
+        return response.text
 
     except Exception as e:
         return str(e)
