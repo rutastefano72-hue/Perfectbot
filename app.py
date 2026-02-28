@@ -812,7 +812,7 @@ def api_positions():
 def trade_history():
     try:
         timestamp = str(int(time.time() * 1000))
-        request_path = "/api/v2/mix/order/history?productType=usdt-futures&pageSize=50&pageNo=1"
+        request_path = "/api/v2/mix/order/history?productType=usdt-futures&pageSize=5&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
@@ -825,31 +825,11 @@ def trade_history():
 
         url = BASE_URL + request_path
         response = requests.get(url, headers=headers, timeout=10)
-        data = response.json()
 
-        trades = []
-
-        if data.get("code") == "00000":
-            for item in data.get("data", {}).get("list", []):
-                realized = float(item.get("profit", 0))
-                fee = float(item.get("totalFee", 0))
-                net = realized - fee
-
-                trades.append({
-                    "symbol": item.get("symbol"),
-                    "side": item.get("side"),
-                    "entry": item.get("priceAvg"),
-                    "exit": item.get("priceAvg"),
-                    "realized": realized,
-                    "fee": fee,
-                    "net": net
-                })
-
-        return jsonify(trades)
+        return response.text  # 👈 stampiamo tutto grezzo
 
     except Exception as e:
-        print("Trade history error:", str(e), flush=True)
-        return jsonify([])
+        return str(e)
 
 
 @app.route("/start",methods=["POST"])
