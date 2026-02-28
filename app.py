@@ -813,7 +813,7 @@ def trade_history():
     try:
         timestamp = str(int(time.time() * 1000))
 
-        request_path = "/api/v2/mix/order/history-position?productType=umcbl&marginCoin=USDT&pageSize=50&pageNo=1"
+        request_path = "/api/v2/mix/order/fill-history?productType=umcbl&pageSize=50&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
@@ -833,20 +833,14 @@ def trade_history():
 
         if data.get("code") == "00000":
             for item in data.get("data", []):
-                realized = float(item.get("realizedPL", 0))
-                fee = float(item.get("totalFee", 0))
-                net = realized - fee
-
                 trades.append({
                     "symbol": item.get("symbol"),
-                    "side": item.get("holdSide"),
-                    "entry": item.get("openPriceAvg"),
-                    "exit": item.get("closePriceAvg"),
-                    "realized": realized,
-                    "fee": fee,
-                    "net": net,
-                    "open_time": item.get("openTime"),
-                    "close_time": item.get("closeTime")
+                    "side": item.get("side"),
+                    "price": item.get("price"),
+                    "size": item.get("size"),
+                    "fee": item.get("fee"),
+                    "realized": item.get("profit"),
+                    "time": item.get("cTime")
                 })
 
         return jsonify(trades)
