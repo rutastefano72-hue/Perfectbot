@@ -814,7 +814,7 @@ def trade_history():
     try:
 
         timestamp = str(int(time.time() * 1000))
-        request_path = "/api/v2/mix/order/history-position?productType=USDT-FUTURES&pageSize=50&pageNo=1"
+        request_path = "/api/v2/mix/order/history-position?productType=umcbl&pageSize=50&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
