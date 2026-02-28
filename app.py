@@ -808,6 +808,54 @@ def api_positions():
 
     return jsonify(get_open_positions())
 
+@app.route("/trade_history")
+def trade_history():
+
+    try:
+
+        timestamp = str(int(time.time() * 1000))
+        request_path = "/api/v2/mix/order/history-position?productType=USDT-FUTURES&pageSize=50"
+
+        signature = generate_signature(timestamp, "GET", request_path)
+
+        headers = {
+            "ACCESS-KEY": API_KEY,
+            "ACCESS-SIGN": signature,
+            "ACCESS-TIMESTAMP": timestamp,
+            "ACCESS-PASSPHRASE": PASSPHRASE,
+        }
+
+        url = BASE_URL + request_path
+
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        trades = []
+
+        if data.get("code") == "00000":
+
+            for item in data.get("data", []):
+
+                realized = float(item.get("realizedPL", 0))
+                fee = float(item.get("totalFee", 0))
+                net = realized - fee
+
+                trades.append({
+                    "symbol": item.get("symbol"),
+                    "side": item.get("holdSide"),
+                    "entry": item.get("openPriceAvg"),
+                    "exit": item.get("closePriceAvg"),
+                    "realized": realized,
+                    "fee": fee,
+                    "net": net
+                })
+
+        return jsonify(trades)
+
+    except Exception as e:
+        print("Trade history error:", str(e), flush=True)
+        return jsonify([])
+
 
 @app.route("/start",methods=["POST"])
 def start():
