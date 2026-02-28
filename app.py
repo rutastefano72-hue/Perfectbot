@@ -810,11 +810,10 @@ def api_positions():
 
 @app.route("/trade_history")
 def trade_history():
-
     try:
-
         timestamp = str(int(time.time() * 1000))
-        request_path = "/api/v2/mix/order/history-position?productType=umcbl&pageSize=50&pageNo=1"
+
+        request_path = "/api/v2/mix/order/history-position?productType=umcbl&marginCoin=USDT&pageSize=50&pageNo=1"
 
         signature = generate_signature(timestamp, "GET", request_path)
 
@@ -826,15 +825,14 @@ def trade_history():
         }
 
         url = BASE_URL + request_path
+
         response = requests.get(url, headers=headers, timeout=10)
         data = response.json()
 
         trades = []
 
         if data.get("code") == "00000":
-
             for item in data.get("data", []):
-
                 realized = float(item.get("realizedPL", 0))
                 fee = float(item.get("totalFee", 0))
                 net = realized - fee
@@ -846,7 +844,9 @@ def trade_history():
                     "exit": item.get("closePriceAvg"),
                     "realized": realized,
                     "fee": fee,
-                    "net": net
+                    "net": net,
+                    "open_time": item.get("openTime"),
+                    "close_time": item.get("closeTime")
                 })
 
         return jsonify(trades)
