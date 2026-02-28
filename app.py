@@ -826,7 +826,7 @@ def trade_history():
         }
 
         url = BASE_URL + request_path
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=10)
         data = response.json()
 
         trades = []
