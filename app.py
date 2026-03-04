@@ -360,6 +360,8 @@ def open_position(symbol, side, size, leverage):
 
         response = requests.post(url, headers=headers, data=body_json)
 
+        print("ENTRY PRICE USED:", price, flush=True)
+
         print("ORDER RESPONSE:", response.text, flush=True)
         print("TP SET:", take_profit_price, flush=True)
         print("SL SET:", stop_loss_price, flush=True)
