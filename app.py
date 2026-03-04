@@ -485,13 +485,10 @@ def detect_market_regime(symbol):
         ema50 = pd.Series(closes).ewm(span=50).mean()
         ema200 = pd.Series(closes).ewm(span=200).mean()
 
-        # Calcolo slope EMA200
-        if len(ema200) < 10:
-            return "NO_TRADE"
+        # slope più stabile (prima era -10)
+        ema200_slope = ema200.iloc[-1] - ema200.iloc[-20]
 
-        ema200_slope = ema200.iloc[-1] - ema200.iloc[-10]
-
-        # Distanza tra EMA50 e EMA200
+        # distanza tra le medie
         ema_distance = abs(ema50.iloc[-1] - ema200.iloc[-1]) / closes[-1]
 
         # ATR semplificato
@@ -501,20 +498,27 @@ def detect_market_regime(symbol):
         tr = np.maximum(tr1, np.maximum(tr2, tr3))
         atr = pd.Series(tr).rolling(14).mean().iloc[-1] / closes[-1]
 
-        # Forza trend (simile ADX)
+        # forza trend (simile ADX)
         adx_strength = ema_distance * 100
 
-        # Logica decisionale
+        # =========================
+        # LOGICA REGIME
+        # =========================
 
-        if atr < 0.003:
+        # mercato troppo fermo
+        if atr < 0.002:
             return "NO_TRADE"
 
-        if adx_strength > 0.5 and ema200_slope > 0:
-            return "TREND_UP"
+        # trend forte
+        if adx_strength > 0.3:
 
-        if adx_strength > 0.5 and ema200_slope < 0:
-            return "TREND_DOWN"
+            if ema200_slope > 0:
+                return "TREND_UP"
 
+            if ema200_slope < 0:
+                return "TREND_DOWN"
+
+        # volatilità alta ma senza direzione
         if atr > 0.02:
             return "VOLATILE"
 
