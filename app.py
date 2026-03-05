@@ -27,7 +27,7 @@ LEVERAGE = 5
 capital_percent = {"value": 0.10}
 last_trade_time = None
 
-STOP_LOSS_PERCENT = 0.8
+STOP_LOSS_PERCENT = 4
 TAKE_PROFIT_PERCENT = 0.4
 
 MAX_ACTIVE_TRADES = 5
