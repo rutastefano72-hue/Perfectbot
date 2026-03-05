@@ -756,9 +756,9 @@ def scanner_loop():
 
                 scan_market()
 
-                print("SCAN COMPLETE — waiting 60 seconds", flush=True)
+                print("SCAN COMPLETE — waiting 20 seconds", flush=True)
 
-                time.sleep(60)
+                time.sleep(20)
 
             else:
 
