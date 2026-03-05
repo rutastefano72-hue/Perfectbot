@@ -710,7 +710,6 @@ def scan_market():
 # =========================
 
 def get_market_symbols():
-
     try:
 
         symbols = [
@@ -723,7 +722,18 @@ def get_market_symbols():
             "AVAXUSDT",
             "LINKUSDT",
             "DOGEUSDT",
-            "MATICUSDT"
+            "MATICUSDT",
+
+            "ATOMUSDT",
+            "INJUSDT",
+            "APTUSDT",
+            "ARBUSDT",
+            "OPUSDT",
+            "NEARUSDT",
+            "FILUSDT",
+            "SUIUSDT",
+            "SEIUSDT",
+            "ETCUSDT"
         ]
 
         print("FIXED SYMBOL LIST SELECTED:", symbols, flush=True)
@@ -731,7 +741,6 @@ def get_market_symbols():
         return symbols
 
     except Exception as e:
-
         print("Error selecting fixed symbols:", str(e), flush=True)
         return []
 
