@@ -596,7 +596,7 @@ def get_signal(symbol):
         if regime == "TREND_UP" and ema50 > ema200:
 
             # prezzo era sotto o vicino EMA50 e ora chiude sopra
-            if price > ema50:
+            if price > ema50 and price < ema50 * 1.003:
 
                 if htf_trend == "buy":
                     print(f"{symbol} PULLBACK LONG (HTF aligned)", flush=True)
@@ -609,7 +609,7 @@ def get_signal(symbol):
         if regime == "TREND_DOWN" and ema50 < ema200:
 
             # prezzo era sopra o vicino EMA50 e ora chiude sotto
-            if price < ema50:
+            if price < ema50 and price > ema50 * 0.997:
 
                 if htf_trend == "sell":
                     print(f"{symbol} PULLBACK SHORT (HTF aligned)", flush=True)
