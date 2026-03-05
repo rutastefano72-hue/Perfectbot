@@ -334,6 +334,8 @@ def open_position(symbol, side, size, leverage):
             "tradeSide": "open",
             "orderType": "market",
 
+            "holdSide": "long" if side == "buy" else "short",
+
             "presetTakeProfitPrice": str(take_profit_price),
             "presetStopLossPrice": str(stop_loss_price),
 
