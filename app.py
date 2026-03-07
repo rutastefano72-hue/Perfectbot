@@ -113,7 +113,6 @@ def get_real_balance():
 # =========================
 
 def get_open_positions():
-
     try:
 
         timestamp = str(int(time.time() * 1000))
@@ -147,17 +146,30 @@ def get_open_positions():
 
                     symbol = pos.get("symbol")
                     side = pos.get("holdSide")
+
                     entry_price = float(pos.get("openPriceAvg", 0))
+
                     unrealized = float(pos.get("unrealizedPL", 0))
 
-                    # Calcolo notional attuale
                     mark_price = float(pos.get("markPrice", 0))
-                    notional = size * mark_price
 
-                    # Fee round trip stimata (0.06% entrata + 0.06% uscita)
-                    estimated_fees = notional * 0.0012
+                    # ==========================
+                    # CALCOLO FEE CORRETTO
+                    # ==========================
 
-                    # PNL netto reale stimato
+                    notional = size * entry_price
+
+                    fee_rate = 0.0006   # 0.06%
+
+                    fee_open = notional * fee_rate
+                    fee_close = notional * fee_rate
+
+                    estimated_fees = fee_open + fee_close
+
+                    # ==========================
+                    # PNL NETTO
+                    # ==========================
+
                     net_pnl = unrealized - estimated_fees
 
                     trades.append({
