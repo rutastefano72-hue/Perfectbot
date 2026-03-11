@@ -139,8 +139,8 @@ td{
 
 <div class="card">
 <h3>Balance</h3>
-<div id="balance" class="value">$0</div>
-</div>
+<div id="balance" class="value">0</div>
+<div id="balance_eur" style="opacity:0.7; margin-top:5px;">≈ 0 EUR</div>
 
 <div class="card">
 <h3>Status</h3>
@@ -186,8 +186,21 @@ async function loadData(){
     let res = await fetch("/status");
     let data = await res.json();
 
-    document.getElementById("balance").innerText = "$" + data.balance;
+    // BALANCE USDT
+    document.getElementById("balance").innerText =
+        data.balance.toFixed(2) + " USDT";
 
+    // CONVERSIONE EUR
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=eur")
+    .then(res => res.json())
+    .then(priceData => {
+        let eurRate = priceData.tether.eur;
+        let eurValue = data.balance * eurRate;
+        document.getElementById("balance_eur").innerText =
+            "≈ " + eurValue.toFixed(2) + " EUR";
+    });
+
+    // STATUS BOT
     let statusEl = document.getElementById("status");
 
     if(data.status === "online"){
@@ -198,13 +211,14 @@ async function loadData(){
         statusEl.className = "value offline";
     }
 
+    // POSIZIONI APERTE
     let posRes = await fetch("/get_open_positions");
     let positions = await posRes.json();
 
     let table = document.getElementById("liveTradesTable");
     table.innerHTML = "";
 
-    if(positions.length === 0){
+    if(!positions || positions.length === 0){
         table.innerHTML = "<tr><td colspan='5'>No trades</td></tr>";
         return;
     }
@@ -217,18 +231,18 @@ async function loadData(){
         let pnlColor = pnl >= 0 ? "#00ff88" : "#ff4d4d";
         let pnlGlow = pnl >= 0 ? "0 0 8px #00ff88" : "0 0 8px #ff4d4d";
 
-        let netColor = net >= 0 ? "#00d4ff" : "#ff9900";
-        let netGlow = net >= 0 ? "0 0 8px #00d4ff" : "0 0 8px #ff9900";
+        let netColor = net >= 0 ? "#00ddff" : "#ff9900";
+        let netGlow = net >= 0 ? "0 0 8px #00ddff" : "0 0 8px #ff9900";
 
         table.innerHTML += `
         <tr>
             <td>${pos.symbol}</td>
             <td>${pos.side}</td>
             <td>${pos.entry}</td>
-            <td style="color:${pnlColor}; text-shadow:${pnlGlow}; font-weight:bold;">
+            <td style="color:${pnlColor}; text-shadow:${pnlGlow}; font-weight:bold">
                 ${pnl.toFixed(4)}
             </td>
-            <td style="color:${netColor}; text-shadow:${netGlow}; font-weight:bold;">
+            <td style="color:${netColor}; text-shadow:${netGlow}; font-weight:bold">
                 ${net.toFixed(4)}
             </td>
         </tr>
