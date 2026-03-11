@@ -435,7 +435,7 @@ def get_higher_timeframe_trend(symbol):
 
     try:
 
-        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=3600&limit=200&productType=USDT-FUTURES"
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=1h&limit=200&productType=USDT-FUTURES"
 
         response = requests.get(url)
         data = response.json()
@@ -472,7 +472,7 @@ def detect_market_regime(symbol):
 
     try:
 
-        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=900&limit=200&productType=USDT-FUTURES"
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=15m&limit=200&productType=USDT-FUTURES"
 
         response = requests.get(url)
         data = response.json()
@@ -537,7 +537,7 @@ def get_signal(symbol):
 
     try:
 
-        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=300&limit=200&productType=USDT-FUTURES"
+        url = BASE_URL + f"/api/v2/mix/market/candles?symbol={symbol}&granularity=5m&limit=200&productType=USDT-FUTURES"
 
         response = requests.get(url)
         data = response.json()
