@@ -448,7 +448,7 @@ def get_higher_timeframe_trend(symbol):
         if not candles or not isinstance(candles, list):
             return None
 
-        if len(candles) < :50
+        if len(candles) < 30:
             return None
 
         closes = np.array([float(c[4]) for c in candles])
