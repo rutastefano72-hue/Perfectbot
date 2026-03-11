@@ -148,7 +148,7 @@ def get_open_positions():
 
             for pos in data["data"]:
 
-                size = float(pos.get("total", 0))
+                size = float(pos.get("holdVolume", 0))
                 if size <= 0:
                     continue
 
@@ -169,11 +169,12 @@ def get_open_positions():
                 # STIMA NETTO REALE
                 # =========================
 
-                notional = size * entry_price
+                notional_open = size * entry_price
+                notional_close = size * mark_price
                 fee_rate = 0.0006
 
-                fee_open = notional * fee_rate
-                fee_close = notional * fee_rate
+                fee_open = notional_open * fee_rate
+                fee_close = notional_close * fee_rate
 
                 estimated_fees = fee_open + fee_close
 
