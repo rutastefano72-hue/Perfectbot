@@ -193,6 +193,15 @@ def get_open_positions():
         print("GET POSITIONS ERROR:", str(e), flush=True)
         return []
 
+def get_open_positions_count():
+    try:
+        positions = get_open_positions()
+        if not positions:
+            return 0
+        return len(positions)
+    except:
+        return 0
+
         
 
 
