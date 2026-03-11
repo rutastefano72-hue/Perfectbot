@@ -210,6 +210,19 @@ def get_open_positions_count():
 # SYMBOL PRECISION
 # =========================
 
+def get_current_price(symbol):
+    try:
+        url = BASE_URL + f"/api/v2/mix/market/ticker?symbol={symbol}&productType=USDT-FUTURES"
+        response = requests.get(url)
+        data = response.json()
+
+        if data.get("code") == "00000":
+            return float(data["data"][0]["lastPr"])
+
+        return None
+    except:
+        return None
+
 def get_symbol_precision(symbol):
 
     try:
