@@ -127,13 +127,10 @@ def get_real_balance():
 
 def get_open_positions():
     try:
-
         timestamp = str(int(time.time() * 1000))
-
         request_path = "/api/v2/mix/position/all-position?productType=USDT-FUTURES"
 
-        signature = generate_signature(timestamp, "GET", request_path)
-
+        signature = generate_signature(timestamp, "GET", request_path, "")
         headers = {
             "ACCESS-KEY": API_KEY,
             "ACCESS-SIGN": signature,
@@ -142,9 +139,7 @@ def get_open_positions():
         }
 
         url = BASE_URL + request_path
-
         response = requests.get(url, headers=headers)
-
         data = response.json()
 
         trades = []
@@ -154,84 +149,51 @@ def get_open_positions():
             for pos in data["data"]:
 
                 size = float(pos.get("total", 0))
+                if size <= 0:
+                    continue
 
-                if size > 0:
+                symbol = pos.get("symbol")
+                side = pos.get("holdSide")
+                entry_price = float(pos.get("openPriceAvg", 0))
 
-                    symbol = pos.get("symbol")
-                    side = pos.get("holdSide")
+                unrealized = float(pos.get("unrealizedPL", 0))
+                mark_price = float(pos.get("markPrice", 0))
 
-                    entry_price = float(pos.get("openPriceAvg", 0))
+                # =========================
+                # PNL REALE (IDENTICO BITGET)
+                # =========================
 
-                    unrealized = float(pos.get("unrealizedPL", 0))
+                pnl = unrealized
 
-                    mark_price = float(pos.get("markPrice", 0))
+                # =========================
+                # STIMA NETTO REALE
+                # =========================
 
-                    # ==========================
-                    # CALCOLO FEE CORRETTO
-                    # ==========================
+                notional = size * entry_price
+                fee_rate = 0.0006
 
-                    notional = size * entry_price
+                fee_open = notional * fee_rate
+                fee_close = notional * fee_rate
 
-                    fee_rate = 0.0006   # 0.06%
+                estimated_fees = fee_open + fee_close
 
-                    fee_open = notional * fee_rate
-                    fee_close = notional * fee_rate
+                net_pnl = pnl - estimated_fees
 
-                    estimated_fees = fee_open + fee_close
-
-                    # ==========================
-                    # PNL NETTO
-                    # ==========================
-
-                    net_pnl = unrealized - estimated_fees
-
-                    trades.append({
-
-                        "symbol": symbol,
-                        "side": side,
-                        "entry": entry_price,
-                        "pnl": unrealized,
-                        "net_pnl": net_pnl
-
-                    })
+                trades.append({
+                    "symbol": symbol,
+                    "side": side,
+                    "entry": entry_price,
+                    "pnl": pnl,
+                    "net_pnl": net_pnl
+                })
 
         return trades
 
-    except:
-
+    except Exception as e:
+        print("GET POSITIONS ERROR:", str(e), flush=True)
         return []
 
-
-def get_open_positions_count():
-
-    positions = get_open_positions()
-
-    return len(positions)
-
-
-# =========================
-# PRICE
-# =========================
-
-def get_current_price(symbol):
-
-    try:
-
-        url = BASE_URL + f"/api/v2/mix/market/ticker?symbol={symbol}&productType=USDT-FUTURES"
-
-        response = requests.get(url)
-
-        data = response.json()
-
-        if data.get("code") == "00000":
-
-            return float(data["data"][0]["lastPr"])
-
-        return None
-
-    except:
-
-        return None
+        
 
 
 # =========================
