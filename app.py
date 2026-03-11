@@ -825,6 +825,10 @@ def api_positions():
 
     return jsonify(get_open_positions())
 
+@app.route("/health")
+def health():
+    return "OK"
+
 @app.route("/trade_history")
 def trade_history():
     try:
