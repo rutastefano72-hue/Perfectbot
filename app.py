@@ -80,7 +80,7 @@ def get_real_balance():
 
         request_path = "/api/v2/mix/account/accounts?productType=USDT-FUTURES"
 
-        signature = generate_signature(timestamp,"GET",request_path)
+        signature = generate_signature(timestamp, "GET", request_path)
 
         headers = {
             "ACCESS-KEY": API_KEY,
@@ -95,16 +95,29 @@ def get_real_balance():
 
         data = response.json()
 
-        if data.get("code") == "00000":
+        if data.get("code") != "00000":
+            return 0
 
-            return float(data["data"][0]["usdtEquity"])
+        equity = float(data["data"][0]["usdtEquity"])
 
-        return 0
+        # 🔥 sottrai fee stimate open trades
+        trades = get_open_positions()
+
+        total_estimated_fees = 0
+
+        for t in trades:
+            pnl = t["pnl"]
+            net = t["net_pnl"]
+
+            fee = pnl - net
+            total_estimated_fees += fee
+
+        real_balance = equity - total_estimated_fees
+
+        return real_balance
 
     except Exception as e:
-
         print("Balance error:", e)
-
         return 0
 
 
