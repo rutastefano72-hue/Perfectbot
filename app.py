@@ -148,7 +148,7 @@ def get_open_positions():
 
             for pos in data["data"]:
 
-                size = float(pos.get("holdVolume", 0))
+                size = float(pos.get("total", pos.get("holdVolume", 0)))
                 if size <= 0:
                     continue
 
