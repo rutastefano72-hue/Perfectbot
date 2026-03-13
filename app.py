@@ -23,7 +23,7 @@ API_KEY = os.environ.get("BITGET_API_KEY")
 API_SECRET = os.environ.get("BITGET_API_SECRET")
 PASSPHRASE = os.environ.get("BITGET_API_PASSPHRASE")
 
-LEVERAGE = 5
+LEVERAGE = 10
 capital_percent = {"value": 0.10}
 last_trade_time = None
 
